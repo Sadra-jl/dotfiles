@@ -46,7 +46,7 @@ reset="\033[0m"
 
 #list of packages to install
 
-pkgs=(wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf betterdiscordctl-git skypeforlinux-bin timeshift calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-btrfs grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch )
+pkgs=(github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf betterdiscordctl-git skypeforlinux-bin timeshift calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-btrfs grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch )
 
 #todo add dnSpyEx (hard to get it working on linux)
 dotnet_packages=(dotnet-host-bin dotnet-runtime-bin dotnet-sdk-bin dotnet-targeting-pack-bin)
@@ -468,12 +468,35 @@ EOT
 	sudo rm -rf /usr/share/sddm/themes/{elarun, maldives, maya} || { ERROR "Removal of unwanted folders failed (sddm).";  }
 
 	if ask_prompt "create a git for your configurations? you can add your dotfiles in it and sync with bare git. (y/n)"; then
-
 		git init --bare $HOME/.cfg
 
 		alias config="/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME"
 		config config --local status.showUntrackedFiles no
 		echo "alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'" >> $HOME/.config/fish/conf.d/alias.fish
+
+		INFO "login to github."
+
+		gh auth login
+
+		local usrname=$(gh api /user | jq -r '.login')
+
+		Yellow "Please create a repository with name .cfg in git hub. do not add readme, license or .gitignore"
+		Blue "press return when you created the repo"
+
+		local current_dir=$(pwd)
+
+		local repo_url=$("https://github.com/$usrname/.cfg.git")
+
+		cd $HOME/.cfg
+
+		touch test
+
+		config add test
+		config commit -m "this is a test"
+		config push
+
+		git remote add origin "$repo_url"
+		git push origin
 
 	fi
 }

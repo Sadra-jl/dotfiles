@@ -1,6 +1,5 @@
 #!/bin/bash
 
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 #⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 #⠀⠀⠀⠀⢰⣦⡀⠀⠀⠀⠀⠀⣰⣿⣿⣿⣷⣄⠀⠀⠀⠀⠀⢀⣴⣦⠀⠀⠀⠀
 #⠀⠀⠀⠀⣿⣿⣿⣦⡀⠀⠀⣼⣿⣿⣿⣿⣿⣿⣆⠀⠀⢀⣴⣿⣿⣿⠀⠀⠀⠀,ggggggggggg,                               ,gggg,
@@ -46,7 +45,7 @@ reset="\033[0m"
 
 #list of packages to install
 
-pkgs=(github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf betterdiscordctl-git skypeforlinux-bin timeshift calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-btrfs grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch )
+pkgs=(typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf betterdiscordctl-git skypeforlinux-bin timeshift calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-btrfs grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch )
 
 #todo add dnSpyEx (hard to get it working on linux)
 dotnet_packages=(dotnet-host-bin dotnet-runtime-bin dotnet-sdk-bin dotnet-targeting-pack-bin)
@@ -256,7 +255,9 @@ configure_zoxide(){
 		#and abow situation might occur when accidently sourcing multiple files or config.fish more
 		#than once
 		
-		echo 'alias cd="z"' >> ~/.config/fish/config.fish
+		if ! $(grep 'alias cd="z"' ~/.config/fish/config.fish) &> /dev/null; then
+			echo -e 'alias cd="z"\n' >> ~/.config/fish/config.fish
+		fi
 
 		INFO "done"
 	fi
@@ -428,7 +429,7 @@ change it yourself after installation"
 
 		local alias_path=~/.config/fish/conf.d/alias.fish
 
-		if [ -f $alias_path ] && [ ! $( ask_prompt "do you want to backup $alias_path?") ]; then
+		if [ -f $alias_path ] && [ ask_prompt "do you want to backup $alias_path?" ]; then
 			backup $alias_path
 		fi
 
@@ -482,6 +483,7 @@ EOT
 
 		Yellow "Please create a repository with name .cfg in git hub. do not add readme, license or .gitignore"
 		Blue "press return when you created the repo"
+		read -r
 
 		local current_dir=$(pwd)
 
@@ -646,7 +648,7 @@ install_dotnet_tools(){
 }
 
 install_linq_pad(){
-	! &(ask_prompt "install linq pad? (dotnet play ground good for sql; wine must been installed) (y/n):	") && return
+	! $(ask_prompt "install linq pad? (dotnet play ground good for sql; wine must been installed) (y/n):	") && return
 
 	local current_dir=&(pwd)
 	local temp_dir="$current_dir/bootstrap.d"
@@ -775,7 +777,25 @@ EOT
         exit
         }
 
-	 BLUE "Hello, World! ;)"
+	 Blue "Hello, World! ;)"
+
+	cat <<EOF
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢰⣦⡀⠀⠀⠀⠀⠀⣰⣿⣿⣿⣷⣄⠀⠀⠀⠀⠀⢀⣴⣦⠀⠀⠀⠀
+⠀⠀⠀⠀⣿⣿⣿⣦⡀⠀⠀⣼⣿⣿⣿⣿⣿⣿⣆⠀⠀⢀⣴⣿⣿⣿⠀⠀⠀⠀,ggggggggggg,                               ,gggg,
+⠀⠀⠀⠀⣿⣿⣿⣿⣷⡄⠘⣿⣿⣿⣿⣿⣿⣿⡿⠀⣴⣿⣿⣿⣿⣿⠀⠀⠀⠀dP"""88""""""Y8,      ,dPYb,                d8" "8I               I8
+⠀⢸⣦⡀⠙⢿⣿⣿⣿⣿⠆⠈⠛⣋⣉⣉⡛⠛⠀⢾⣿⣿⣿⣿⡿⠟⢀⣤⡆⠀Yb,  88      \`8b      IP'\`Yb                88  ,dP               I8
+⠀⢸⣿⣿⣷⣄⠙⢿⠟⢁⣴⣾⣿⠿⠛⠻⣿⣿⣦⣄⠙⢿⡿⠋⣀⣴⣿⣿⡇⠀ \`"  88      ,8P      I8  8I             8888888P\"             88888888
+⠀⢸⣿⣿⣿⣿⣷⣄⠐⢿⣿⠟⢁⣴⣾⣦⡀⠙⢿⣿⡷⠀⣠⣾⣿⣿⣿⣿⡇⠀     88aaaad8P\"       I8  8\'                88                    I8
+⠀⢸⣿⣿⣿⣿⣿⣿⣦⡀⠁⣴⣿⣿⣿⣿⣿⣦⡈⠋⣠⣾⣿⣿⣿⣿⣿⣿⠃⠀     88""""",gggg,gg  I8 dP   ,ggg,         88          ,ggggg,   I8   gg      gg    ,g,
+⠀⠈⣿⣿⣿⣿⣿⣿⡟⢀⣾⣿⣿⣿⣿⣿⣿⣿⣷⡀⢻⣿⣿⣿⣿⣿⣿⡏⠀⠀     88    dP"  "Y8I  I8dP   i8" "8i   ,aa,_88         dP"  "Y8gggI8   I8      8I   ,8'8,
+⠀⠀⠸⣿⣿⣿⣿⣿⠁⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⠈⣿⣿⣿⣿⣿⡟⠀⠀⠀     88   i8'    ,8I  I8P    I8, ,8I  dP" "88P        i8'    ,8I ,I8,  I8,    ,8I  ,8'  Yb
+⠀⠀⠀⠹⣿⣿⣿⣿⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⣿⣿⣿⣿⡟⠁⠀⠀⠀     88  ,d8,   ,d8b,,d8b,_  \`YbadP'  Yb,_,d88b,,_   ,d8,   ,d8',d88b,,d8b,  ,d8b,,8'_   8)
+⠀⠀⠀⠀⠈⠻⣿⣿⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⢀⣿⣿⡿⠋⠀⠀⠀⠀⠀     88  P"Y8888P"\`Y88P'"Y88888P"Y888  "Y8P"  "Y88888P"Y8888P"  8P""Y88P'"Y88P"\`Y8P' "YY8P8P
+⠀⠀⠀⠀⠀⠀⠈⠛⠧⠘⣿⣿⣿⣿⣿⣿⣿⣿⡿⠁⠼⠋⠁⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⠛⠛⠛⠛⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+---------------------------------------------------------------------------------------------------------------------------
+EOF
 
 	 INFO "updating system first"
 	 yay --noconfirm -Syu

@@ -1,4 +1,5 @@
-#/3/20/24
+# Most of the configuration are copied from:
+# https://gitlab.com/dwt1/dotfiles
 
 #⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 #⠀⠀⠀⠀⢰⣦⡀⠀⠀⠀⠀⠀⣰⣿⣿⣿⣷⣄⠀⠀⠀⠀⠀⢀⣴⣦⠀⠀⠀⠀
@@ -24,16 +25,17 @@ set -U fish_user_paths $HOME/.bin  $HOME/.local/bin $HOME/.config/emacs/bin $HOM
 ### EXPORT
 set fish_greeting                                 # Supresses fish's intro message
 set TERM "xterm-256color"                         # Sets the terminal type
-set EDITOR "lvim"                 # $EDITOR use Emacs in terminal
+set EDITOR "nvim"                 # $EDITOR use Emacs in terminal
 set VISUAL "lvim"              # $VISUAL use Emacs in GUI mode
+set GIT_EDITOR "vim"
 
 ### SET MANPAGER
 ### Uncomment only one of these!
 
 ### "bat" as manpager
 #also can use batman
-set -x MANROFFOPT="-c"
-set -x MANPAGER="sh -c 'col -bx | bat -l man -p'"
+set -x MANROFFOPT "-c"
+set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 
 # Function for printing a column (splits input on whitespace)
 # ex: echo 1 2 3 | coln 3

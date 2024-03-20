@@ -26,4 +26,30 @@ alias unlock='sudo rm /var/lib/pacman/db.lck'    # remove pacman lock
 
 alias fzf='fzf --preview "bat --color=always --style=numbers --line-range=:500 {}"'
 
+# adding flags
+alias df='df -h'                          # human-readable sizes
+alias free='free -m'                      # show sizes in MB
+
+# ps
+alias psa="ps auxf"
+alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
+alias psmem='ps auxf | sort -nr -k 4'
+alias pscpu='ps auxf | sort -nr -k 3'
+
+# git
+alias addup='git add -u'
+alias addall='git add .'
+alias branch='git branch'
+alias checkout='git checkout'
+alias clone='git clone'
+alias commit='git commit -m'
+alias fetch='git fetch'
+alias pull='git pull origin'
+alias push='git push origin'
+alias tag='git tag'
+alias newtag='git tag -a'
+
+## get error messages from journalctl
+alias jctl="journalctl -p 3 -xb"
+
 alias config='/usr/bin/git --git-dir=/home/sj13/.cfg/ --work-tree=/home/sj13'

@@ -20,7 +20,7 @@ alias lti='eza -al --sort=modified'
 # tree listing
 alias lt='eza -aT --color=always --group-directories-first'
 
-alias l.='eza -a | egrep "^\."'
+alias l.='eza -a | grep -E "^\."'
 
 alias unlock='sudo rm /var/lib/pacman/db.lck'    # remove pacman lock
 

@@ -45,7 +45,7 @@ reset="\033[0m"
 
 #list of packages to install
 
-pkgs=(typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf betterdiscordctl-git skypeforlinux-bin timeshift calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-btrfs grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch )
+pkgs=(nvidia-dkms nvidia-utils lib32-nvidia-utils nvidia-settings typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf betterdiscordctl-git skypeforlinux-bin timeshift calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-btrfs grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch )
 
 #todo add dnSpyEx (hard to get it working on linux)
 dotnet_packages=(dotnet-host-bin dotnet-runtime-bin dotnet-sdk-bin dotnet-targeting-pack-bin)
@@ -605,16 +605,18 @@ change_mirrors(){
 
  install_zen_kernel() {
 
-	! $(ask_prompt "do you want to install and change kernel to zen-kernel? (y/n):	") && return
 
-	INFO "current kernel: $(uname -r)"
+    WARN "zen kernel(or any over kernels over than vanila linux) may have some problems like for example pc may not shutdown properly sometimes. use at your own risk"
+    ! $(ask_prompt "do you want to install and change kernel to zen-kernel? (y/n):	") && return
 
-	sudo pacman --needed --noconfirm -S  linux-zen linux-zen-headers
+    INFO "current kernel: $(uname -r)"
 
-	sudo grub-mkconfig -o /boot/grub/grub.cfg
+    sudo pacman --needed --noconfirm -S  linux-zen linux-zen-headers
 
-	INFO "install complited, check kernel after reboot with 'uname -r' command"
- }
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+    INFO "install complited, check kernel after reboot with 'uname -r' command"
+  }
 
  install_fonts() {
 	local font_packages=(ttf-ms-win11-auto ttf-ms-win10-auto ttf-jetbrains-mono-nerd cantarell-fonts ttf-noto-nerd ttf-nerd-fonts-symbols-mono ttf-font-awesome awesome-terminal-fonts ttf-bitstream-vera ttf-dejavu ttf-liberation noto-fonts-extra ttf-opensans adobe-source-sans-pro-fonts terminus-font ttf-droid ttf-hack ttf-ms-fonts steam-fonts)
@@ -803,39 +805,51 @@ EOF
 
 	 Yellow "--------------------------------------------Change Mirrors--------------------------------------------"
 	 change_mirrors
+   echo2
 
 	 Yellow "---------------------------------------------Chacnge DNS----------------------------------------------"
 	 change_dns
+   echo2
 
 	 Yellow "-------------------------------------------Installing fonts-------------------------------------------"
 	 install_fonts
+   echo2
 
 	 Yellow "--------------------------------------------Emptying cache--------------------------------------------"
 	 yay_clean_up 10
+   echo2
 
 	 Yellow "---------------------------------------Installing Basic packages--------------------------------------"
 	 install_packages pkgs "yes"
+   echo2
 
 	 Yellow "-----------------------------------------configuring system-------------------------------------------"
 	 configure_system
+   echo2
 
 	 Yellow "----------------------------------------Installing Plugins--------------------------------------------"
 	 install_fish_plugins
+   echo2
 
 	 Yellow "-----------------------------------------Installing Dotnet--------------------------------------------"
 	 install_dotnet
+   echo2
 
 	 Yellow "------------------------------------Installing optional packages--------------------------------------"
 	 optional_packages
+   echo2
 
 	 Yellow "-----------------------------------Installing scientific packages-------------------------------------"
 	 install_scintific
+   echo2
 
 	 Yellow "--------------------------------------------Removing cache--------------------------------------------"
 	 yay_clean_up 50
+   echo2
 
 	 Yellow "-------------------------------------Installing zen kernel--------------------------------------------"
 	 install_zen_kernel
+   echo2
 
 
 	 Yellow "-----------------------------------------------finished-----------------------------------------------"

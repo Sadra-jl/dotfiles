@@ -74,3 +74,11 @@ zoxide init fish | source
 alias cd="z"
 
 complete -f -c dotnet -a "(dotnet complete (commandline -cp))"
+
+
+
+#only print neofetch one
+if not set -q FIRST_FISH_RUN
+	set -U FIRST_FISH_RUN
+	neofetch
+end

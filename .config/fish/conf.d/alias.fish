@@ -25,7 +25,6 @@ alias l.='eza -a | grep -E "^\."'
 alias unlock='sudo rm /var/lib/pacman/db.lck'    # remove pacman lock
 
 alias fzf='fzf --preview "bat --color=always --style=numbers --line-range=:500 {}"'
-
 # adding flags
 alias df='df -h'                          # human-readable sizes
 alias free='free -m'                      # show sizes in MB
@@ -49,7 +48,12 @@ alias push='git push origin'
 alias tag='git tag'
 alias newtag='git tag -a'
 
+# .cfg gits
+alias config='/usr/bin/git --git-dir=/home/sj13/.cfg/ --work-tree=/home/sj13'
+alias confcommit='config commit -m'
+alias confpush='config push origin main'
+alias confstatus='config status'
+
 ## get error messages from journalctl
 alias jctl="journalctl -p 3 -xb"
 
-alias config='/usr/bin/git --git-dir=/home/sj13/.cfg/ --work-tree=/home/sj13'

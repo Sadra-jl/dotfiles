@@ -210,7 +210,7 @@ fisher_installer(){
 	local -n packages=$1
 
 	for package in "${packages[@]}"; do
-		INFO $package
+		INFO "$package"
 		fish --command "fisher install $package"
 		INFO "done."
 		echo
@@ -231,7 +231,8 @@ install_fish_plugins(){
 
 configure_zoxide(){
 
-	local bash_config='eval "$(zoxide init bash)"'
+	local bash_config
+  bash_config="eval \"$(zoxide init bash)\""
 	local fish_config='zoxide init fish | source'
 
 	$(ask_prompt "do you want to backup config.fish? (y/n):  ") && backup ~/.config/fish/config.fish
@@ -296,7 +297,7 @@ if you accidently passed no its time control+c now and start over."
 	fi
 
 	INFO "installing packages"
-	yay -S --needed $pacman_confirm "${packages_to_install[@]}"
+	yay -S --needed "$pacman_confirm" "${packages_to_install[@]}"
 }
 
 
@@ -365,7 +366,7 @@ ffmpeg is binary precompiled from arch repository not arch user repository"
 
 	#install download manager
 	download_manager_editions=("kget" "motrix-bin")
-	install_optional_package "download manager" download_manager_editions $download_manager_description
+	install_optional_package "download manager" download_manager_editions "$download_manager_description"
 
 	#install torrent client
 	torrent_client_edditsion=("qbittorrent" "ktorrent")
@@ -392,7 +393,7 @@ configure_system(){
 	#chnge shell for user
 	#i dont like this if statement
 	if ask_prompt "change shell to fish? y/n:  "; then
-		if sudo chsh --shell $(which fish) $(whoami); then
+		if sudo chsh "--shell $(which fish) $(whoami)"; then
 			Warn "shell changed. restart terminal or source profile."
 		else
 			ERROR "changeing shell to fish failed for the user \"$(whoami)\"
@@ -405,7 +406,7 @@ change it yourself after installation"
 	#change shell for root
 	#i dont like this code duplication
 	if ask_prompt "change shell to fish?($red_b root$reset) y/n:  "; then
-		if sudo chsh --shell $(which fish) root ; then
+		if sudo chsh --shell "$(which fish)" root ; then
 			WARN "shell changed. restart terminal or source profile."
 		else
 			ERROR "changeing shell to fish failed for the root user \"$(whoami)\"
@@ -431,8 +432,8 @@ change it yourself after installation"
 
 		local alias_path=~/.config/fish/conf.d/alias.fish
 
-    if [ -f $alias_path ] && [ $(ask_prompt "do you want to backup $alias_path?") ]; then
-			backup $alias_path
+    if [ -f "$alias_path" ] && [ $(ask_prompt "do you want to backup $alias_path?") ]; then
+			backup "$alias_path"
 		fi
 
 		touch $alias_path
@@ -471,27 +472,31 @@ EOT
 	sudo rm -rf /usr/share/sddm/themes/{elarun, maldives, maya} || { ERROR "Removal of unwanted folders failed (sddm).";  }
 
 	if ask_prompt "create a git for your configurations? you can add your dotfiles in it and sync with bare git. (y/n)"; then
-		git init --bare $HOME/.cfg
 
-		alias config="/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME"
-		config config --local status.showUntrackedFiles no
-		echo "alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'" >> $HOME/.config/fish/conf.d/alias.fish
+		git "init --bare $HOME/.cfg"
+
+		/usr/bin/git "--git-dir=$HOME/.cfg/ --work-tree=$HOME config --local status.showUntrackedFiles no"
+
+		echo "alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'" >> "$HOME/.config/fish/conf.d/alias.fish"
 
 		INFO "login to github."
 
 		gh auth login
 
-		local usrname=$(gh api /user | jq -r '.login')
+		local usrname
+    usrname=$(gh api /user | jq -r '.login')
 
-		Yellow "Please create a repository with name .cfg in git hub. do not add readme, license or .gitignore"
-		Blue "press return when you created the repo"
-		read -r
+    Yellow "Please create a repository in git hub. do not add readme, license or .gitignore the name can be '(dotfiles configs myConfigs .configs .cfg ...)'"
+		Blue "press Enter the name of repository you created"
+		read -r -p "name of repository: " repo_name
 
-		local current_dir=$(pwd)
+		local current_dir
+		current_dir=$(pwd)
 
-		local repo_url=$("https://github.com/$usrname/.cfg.git")
+    local repo_url
+    repo_url=$("https://github.com/$usrname/$repo_name.git")
 
-		cd $HOME/.cfg
+		cd "$HOME/.cfg"
 
 		touch test
 
@@ -501,11 +506,10 @@ EOT
 
 		git remote add origin "$repo_url"
 		git push origin
-
 	fi
 }
-
 install_scintific(){
+
 
 	 ! $( ask_prompt "install scientific apps? $yellow you may not need them.$reset (y/n):  ")  &&  return
 
@@ -585,17 +589,17 @@ change_mirrors(){
 	WARN "showing max of 50 lines."
 
 	INFO "printing yay cache directory"
-	sudo dust -srRP -d 1 -n $number_of_lines ~/.cache/yay
+	sudo dust -srRP -d 1 -n "$number_of_lines" ~/.cache/yay
 	Yellow "--------------------------------------------"
 	echo2
 
 	INFO "printing pacman lib cache directory"
-	sudo dust -srRP -d 1 -n $number_of_lines /var/lib/pacman
+	sudo dust -srRP -d 1 -n "$number_of_lines" /var/lib/pacman
 	Yellow "--------------------------------------------"
 	echo2
 
 	INFO "printing pacman cache directory"
-	sudo dust -srRP -d 1 -n $number_of_lines /var/cache/pacman/pkg
+	sudo dust -srRP -d 1 -n "$number_of_lines" /var/cache/pacman/pkg
 	Yellow "--------------------------------------------"
 	echo2
 
@@ -654,7 +658,9 @@ install_dotnet_tools(){
 install_linq_pad(){
 	! $(ask_prompt "install linq pad? (dotnet play ground good for sql; wine must been installed) (y/n):	") && return
 
-	local current_dir=&(pwd)
+	local current_dir
+  current_dir=$(pwd)
+
 	local temp_dir="$current_dir/bootstrap.d"
 
 	mkdir "$temp_dir" && cd "$temp_dir"
@@ -673,9 +679,9 @@ install_linq_pad(){
 
 	wine LINQPad7Setup_Downloadly.ir.exe &> /dev/null
 
-	yes | cp -i -rf Crack/* "$HOME/.wine/drive_c/Program Files/LINQPad7/" &> /dev/null
+	cp -rf Crack/* "$HOME/.wine/drive_c/Program Files/LINQPad7/" &> /dev/null
 
-	cd $temp_dir
+	cd "$temp_dir"
 
 	http -d https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-7.0.17-windows-x64-installer
 
@@ -692,9 +698,9 @@ install_linq_pad(){
 
 	wine REG ADD 'HKEY_CURRENT_USER\Environment' /v DOTNET_ROOT /t REG_SZ /d 'C:\Program Files\dotnet'
 
-	rm -rf $temp_dir
+	rm -rf "$temp_dir"
 
-	cd $current_dir
+	cd "$current_dir"
 }
 
  install_dotnet() {

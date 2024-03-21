@@ -45,7 +45,7 @@ reset="\033[0m"
 
 #list of packages to install
 
-pkgs=(nvidia-dkms nvidia-utils lib32-nvidia-utils nvidia-settings typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf betterdiscordctl-git skypeforlinux-bin timeshift calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-btrfs grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch )
+pkgs=(wl-clipboard typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf betterdiscordctl-git skypeforlinux-bin timeshift calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-btrfs grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch )
 
 #todo add dnSpyEx (hard to get it working on linux)
 dotnet_packages=(dotnet-host-bin dotnet-runtime-bin dotnet-sdk-bin dotnet-targeting-pack-bin)
@@ -54,6 +54,8 @@ dotnet_packages=(dotnet-host-bin dotnet-runtime-bin dotnet-sdk-bin dotnet-target
 scientific_packages=(maxima geogebra kalzium kbibtex kstars labplot mathematica python-pandas python-matplotlib python-tensorflow cython)
 
 steam_packages=(steam lutris steam-native-runtime dxvk-bin vkd3d-proton winetricks pipewire-pulse)
+
+invidia_packages=(nvidia-dkms nvidia-utils lib32-nvidia-utils nvidia-settings )
 
 
 #--------------------------------functions-----------------------------------
@@ -429,7 +431,7 @@ change it yourself after installation"
 
 		local alias_path=~/.config/fish/conf.d/alias.fish
 
-		if [ -f $alias_path ] && [ ask_prompt "do you want to backup $alias_path?" ]; then
+    if [ -f $alias_path ] && [ $(ask_prompt "do you want to backup $alias_path?") ]; then
 			backup $alias_path
 		fi
 
@@ -619,7 +621,7 @@ change_mirrors(){
   }
 
  install_fonts() {
-	local font_packages=(ttf-ms-win11-auto ttf-ms-win10-auto ttf-jetbrains-mono-nerd cantarell-fonts ttf-noto-nerd ttf-nerd-fonts-symbols-mono ttf-font-awesome awesome-terminal-fonts ttf-bitstream-vera ttf-dejavu ttf-liberation noto-fonts-extra ttf-opensans adobe-source-sans-pro-fonts terminus-font ttf-droid ttf-hack ttf-ms-fonts steam-fonts)
+	local font_packages=(ttf-firacode ttf-ms-win11-auto ttf-ms-win10-auto ttf-jetbrains-mono-nerd cantarell-fonts ttf-noto-nerd ttf-nerd-fonts-symbols-mono ttf-font-awesome awesome-terminal-fonts ttf-bitstream-vera ttf-dejavu ttf-liberation noto-fonts-extra ttf-opensans adobe-source-sans-pro-fonts terminus-font ttf-droid ttf-hack ttf-ms-fonts steam-fonts)
 
 	! $(ask_prompt "install fonts? (y/n):	") && return
 
@@ -746,6 +748,12 @@ EOT
 	 install_linq_pad
 }
 
+install_invidia_packages(){
+  ! $( ask_prompt "are you an invidia user?(y/n): ") && return
+
+  install_packages invidia_packages "yes"
+}
+
 #--------------------------------main-----------------------------------
 
  main(){
@@ -821,6 +829,10 @@ EOF
 
 	 Yellow "---------------------------------------Installing Basic packages--------------------------------------"
 	 install_packages pkgs "yes"
+   echo2
+
+	 Yellow "------------------------------------------Nvidia packages---------------------------------------------"
+   install_packages invidia_packages
    echo2
 
 	 Yellow "-----------------------------------------configuring system-------------------------------------------"

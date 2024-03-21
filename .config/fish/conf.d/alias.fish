@@ -51,8 +51,6 @@ alias newtag='git tag -a'
 # .cfg gits
 alias config='/usr/bin/git --git-dir=/home/sj13/.cfg/ --work-tree=/home/sj13'
 alias confcommit='config commit -m'
-alias confpush='config push origin main'
-alias confstatus='config status'
 
 ## get error messages from journalctl
 alias jctl="journalctl -p 3 -xb"

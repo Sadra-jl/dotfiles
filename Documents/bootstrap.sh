@@ -235,8 +235,8 @@ configure_zoxide(){
   bash_config="eval \"$(zoxide init bash)\""
 	local fish_config='zoxide init fish | source'
 
-	$(ask_prompt "do you want to backup config.fish? (y/n):  ") && backup ~/.config/fish/config.fish
-	$(ask_prompt "do you want to backup .bashrc? (y/n):  ") && backup ~/.bashrc
+	ask_prompt "do you want to backup config.fish? (y/n):  " && backup ~/.config/fish/config.fish
+	ask_prompt "do you want to backup .bashrc? (y/n):  " && backup ~/.bashrc
 
 	INFO "configuring zoxide..."
 

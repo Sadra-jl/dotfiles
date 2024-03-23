@@ -77,8 +77,10 @@ complete -f -c dotnet -a "(dotnet complete (commandline -cp))"
 
 
 
+#this wont work for now 
+#todo: need debuginh
 #only print neofetch one
-if not set -q FIRST_FISH_RUN
-	set -U FIRST_FISH_RUN
-	neofetch
-end
+# if not set -q FIRST_FISH_RUN
+# 	set -U FIRST_FISH_RUN
+# 	neofetch
+# end

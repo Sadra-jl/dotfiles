@@ -476,6 +476,17 @@ EOT
 
 	sudo rm -rf /usr/share/sddm/themes/{elarun, maldives, maya} || { ERROR "Removal of unwanted folders failed (sddm).";  }
 
+  #configuring procs
+  local cwd
+  cwd=$(pwd)
+
+  cd "$HOME/.config/fish/conf.d/"
+
+	if ! [ -f ./procs.fish ]; then
+  procs --gen-completion fish
+  fi
+  cd "$cwd"
+
 	if ask_prompt "create a git for your configurations? you can add your dotfiles in it and sync with bare git. (y/n)"; then
 
 		git "init --bare $HOME/.cfg"

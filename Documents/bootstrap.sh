@@ -422,7 +422,7 @@ change it yourself after installation"
 	fi
 
 	#add persian keyboard
-	if ask_prompt "add windows keybord layout for persian? (y/n):  "; then
+	if ask_prompt "add windows keybord layout for persian?$yellow kde now have persian windows layout (y/n):  "; then
 		git clone https://github.com/sinadarvi/windows-persian-keyboard-for-linux.git
 		cd windows-persian-keyboard-for-linux
 		sudo chmod +x ./install

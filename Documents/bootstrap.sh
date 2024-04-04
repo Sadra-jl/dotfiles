@@ -70,6 +70,7 @@ invidia_packages=(nvidia-dkms nvidia-utils lib32-nvidia-utils nvidia-settings )
 
 echo2()   { echo -e  "$@" >&2 ; }
 
+# following 30 lines is from endeavourOs scripts im sure this error is not a big deal and will work
 Red(){ echo2 "$red""$@""$reset"; }
 Yellow(){ echo2 "$yellow""$@""$reset"; }
 Blue(){ echo2 "$blue""$@""$reset"; }
@@ -162,13 +163,17 @@ backup() {
 
 #3/16/24 update:
 #	it turns out wrapping function and its arguments with $() will solve the problem :)
+#	4/4/24 update:
+#	again it gets "Remove surrounding $() to avoid executing output (or use eval if intentional)." warning
+#	using eval will get the mentioned error so maybe add it like eval "$()" and ask for help maybe?
+#	I will move on for now.
 
  install_optional_package(){
 	local package_name=$1
 	local -n package_options=$2
 	local description=$3
 
-	 ! $( ask_prompt "install $package_name? y/n:  ")  && return
+	 ! eval "$( ask_prompt "install $package_name? y/n:  ")"  && return
 
 	WARN "apps to install options are:	"
 
@@ -193,7 +198,7 @@ backup() {
 
 
  change_dns(){
-	 ! $( ask_prompt "use Beshkan DNS servers to bypass restriction?$reset ($yellow this will disable NetworkManager auto DNS assignment$reset) y/n:	") && return
+	 ! eval "$( ask_prompt "use Beshkan DNS servers to bypass restriction?$reset ($yellow this will disable NetworkManager auto DNS assignment$reset) y/n:	")" && return
 
 	backup /etc/NetworkManager/NetworkManager.conf
 	echo -e "[Main]\ndns=none\n#plugins=ifcfg-rh,ibft" | sudo tee -a /etc/NetworkManager/NetworkManager.conf
@@ -258,7 +263,7 @@ configure_zoxide(){
 		#and abow situation might occur when accidently sourcing multiple files or config.fish more
 		#than once
 		
-		if ! $(grep 'alias cd="z"' ~/.config/fish/config.fish) &> /dev/null; then
+		if ! eval "$(grep 'alias cd="z"' ~/.config/fish/config.fish)" &> /dev/null; then
 			echo -e 'alias cd="z"\n' >> ~/.config/fish/config.fish
 		fi
 
@@ -285,7 +290,7 @@ install_packages(){
 	done
 
 
-	if ! $( ask_prompt "press y to continue:  "); then
+	if ! eval "$( ask_prompt "press y to continue:  ")"; then
 		if [ "$terminate_app_str" = "yes" ]; then
 			WARN "this packages are important to for furthur installation and are 50% of what this script is about
 if you accidently passed no its time control+c now and start over."
@@ -432,7 +437,7 @@ change it yourself after installation"
 
 		local alias_path=~/.config/fish/conf.d/alias.fish
 
-    if [ -f "$alias_path" ] && [ $(ask_prompt "do you want to backup $alias_path?") ]; then
+    if [ -f "$alias_path" ] && [ $( ask_prompt "do you want to backup $alias_path?") ]; then
 			backup "$alias_path"
 		fi
 
@@ -511,7 +516,7 @@ EOT
 install_scintific(){
 
 
-	 ! $( ask_prompt "install scientific apps? $yellow you may not need them.$reset (y/n):  ")  &&  return
+	 ! eval "$( ask_prompt "install scientific apps? $yellow you may not need them.$reset (y/n):  ") " &&  return
 
 	install_packages scientific_packages "no"
 
@@ -529,7 +534,7 @@ install_scintific(){
 
 change_mirrors(){
 
-	! $(ask_prompt "change mirrors? (rate-mirrors program will be installed) y/n:	") && return
+  ! eval "$(ask_prompt "change mirrors? (rate-mirrors program will be installed) y/n:	")" && return
 
 	INFO "installing rate-mirrors"
 
@@ -553,7 +558,7 @@ change_mirrors(){
 	local https="--protocol https"
 	local protocol="$http $https"
 
-	if ! $( ask_prompt "do you want to include http? y/n:	") ; then
+	if ! eval "$( ask_prompt "do you want to include http? y/n:	")" ; then
 		protocol=$https;
 	fi
 
@@ -561,9 +566,9 @@ change_mirrors(){
 	rate-mirrors --allow-root "$protocol" arch | sudo tee /etc/pacman.d/mirrorlist
 
 	#updating	endeavourOs mirrorlist
-	! $( ask_prompt "do you want to update EndeavourOs mirrorlist as well?")  && return
+	! eval "$( ask_prompt "do you want to update EndeavourOs mirrorlist as well?") " && return
 
-	 $( ask_prompt "do want to backup endeavouros-mirrorlist?(recommended) y/n:	")  && backup /etc/pacman.d/endeavouros-mirrorlist
+	 eval "$( ask_prompt "do want to backup endeavouros-mirrorlist?(recommended) y/n:	") " && backup /etc/pacman.d/endeavouros-mirrorlist
 
 	if  ask_prompt "do you want to include http? y/n:	"; then
 		protocol="$http $https"
@@ -580,7 +585,7 @@ change_mirrors(){
 
 	local number_of_lines=$1
 
-	! $(ask_prompt "do you want to clear package installation cache? (y/n):	") && return
+	! eval "$(ask_prompt "do you want to clear package installation cache? (y/n):	")" && return
 
 	Blue "usally it's good to have 3 last installed package cache for rollback system,
 	but in my openion it's ok to remove them as they are fresh install and I hope furthur
@@ -604,7 +609,7 @@ change_mirrors(){
 	echo2
 
 
-	! $(ask_prompt "prossed with operation?(y/n):	") && return
+	! eval "$(ask_prompt "prossed with operation?(y/n):	")" && return
 
 	yay -Scc
  }
@@ -613,7 +618,7 @@ change_mirrors(){
 
 
     WARN "zen kernel(or any over kernels over than vanila linux) may have some problems like for example pc may not shutdown properly sometimes. use at your own risk"
-    ! $(ask_prompt "do you want to install and change kernel to zen-kernel? (y/n):	") && return
+    ! eval "$(ask_prompt "do you want to install and change kernel to zen-kernel? (y/n):	")" && return
 
     INFO "current kernel: $(uname -r)"
 
@@ -627,7 +632,7 @@ change_mirrors(){
  install_fonts() {
 	local font_packages=(ttf-firacode ttf-ms-win11-auto ttf-ms-win10-auto ttf-jetbrains-mono-nerd cantarell-fonts ttf-noto-nerd ttf-nerd-fonts-symbols-mono ttf-font-awesome awesome-terminal-fonts ttf-bitstream-vera ttf-dejavu ttf-liberation noto-fonts-extra ttf-opensans adobe-source-sans-pro-fonts terminus-font ttf-droid ttf-hack ttf-ms-fonts steam-fonts)
 
-	! $(ask_prompt "install fonts? (y/n):	") && return
+	! eval "$(ask_prompt "install fonts? (y/n):	")" && return
 
 	install_packages font_packages "no"
  }
@@ -644,7 +649,7 @@ dotnet_installer(){
 }
 
 install_dotnet_tools(){
-	 ! $( ask_prompt "install dotnet cli tools? (y/n):  ")  && return
+	 ! eval "$( ask_prompt "install dotnet cli tools? (y/n):  ") " && return
 
 	sudo dotnet workload update
 
@@ -656,7 +661,7 @@ install_dotnet_tools(){
 }
 
 install_linq_pad(){
-	! $(ask_prompt "install linq pad? (dotnet play ground good for sql; wine must been installed) (y/n):	") && return
+	! eval "$(ask_prompt "install linq pad? (dotnet play ground good for sql; wine must been installed) (y/n):	")" && return
 
 	local current_dir
   current_dir=$(pwd)
@@ -710,7 +715,7 @@ using rider eap does not need any licencing as eap stands for early access progr
 its license trial is 30 days and you have to update to next eap.
 by installing rider you need to have license (or get it in other ways ;) )"
 
-	 ! $(ask_prompt "install dotnet group? (sdk $(pacman -Qi dotnet-sdk | rg Version)) (y/n)?:	") && return
+	 ! eval "$(ask_prompt "install dotnet group? (sdk $(pacman -Qi dotnet-sdk | rg Version)) (y/n)?:	")" && return
 
 	 install_packages dotnet_packages "no"
 
@@ -755,7 +760,7 @@ EOT
 }
 
 install_invidia_packages(){
-  ! $( ask_prompt "are you an invidia user?(y/n): ") && return
+  ! eval "$( ask_prompt "are you an invidia user?(y/n): ")" && return
 
   install_packages invidia_packages "yes"
 }
@@ -795,7 +800,8 @@ install_invidia_packages(){
 
 	 Blue "Hello, World! ;)"
 
-	cat <<EOF
+echo -e "$blue"
+	cat  <<EOF
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⢰⣦⡀⠀⠀⠀⠀⠀⣰⣿⣿⣿⣷⣄⠀⠀⠀⠀⠀⢀⣴⣦⠀⠀⠀⠀
 ⠀⠀⠀⠀⣿⣿⣿⣦⡀⠀⠀⣼⣿⣿⣿⣿⣿⣿⣆⠀⠀⢀⣴⣿⣿⣿⠀⠀⠀⠀,ggggggggggg,                               ,gggg,
@@ -812,6 +818,7 @@ install_invidia_packages(){
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⠛⠛⠛⠛⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ---------------------------------------------------------------------------------------------------------------------------
 EOF
+echo -e "$reset"
 
 	 INFO "updating system first"
 	 yay --noconfirm -Syu

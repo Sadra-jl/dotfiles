@@ -25,7 +25,8 @@ function help -d "show app_name --help in bat"
 end
 
 function fz -d "fast directory change with fzf and zoxide"
-    command __zoxide_cd $(find . -type d -print | fzf)
+    # command __zoxide_cd $(find . -type d -print | fzf)
+     __zoxide_cd && __zoxide_cd $(fd -0 --type d --ignore-file ~/.config/fd/ignore --hidden | fzf --read0)
 end
 
 function lvimf -d "fast lunarvim open with fzf"

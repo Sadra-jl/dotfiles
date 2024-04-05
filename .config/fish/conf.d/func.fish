@@ -24,4 +24,10 @@ function help -d "show app_name --help in bat"
     command $argv --help 2>&1 | bat --plain --language=help
 end
 
+function fz -d "fast directory change with fzf and zoxide"
+    command __zoxide_cd $(find . -type d -print | fzf)
+end
 
+function lvimf -d "fast lunarvim open with fzf"
+    command lvim $(fzf)
+end

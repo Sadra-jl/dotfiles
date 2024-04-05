@@ -75,7 +75,8 @@ alias cd="z"
 
 complete -f -c dotnet -a "(dotnet complete (commandline -cp))"
 
-
+#no need for this 
+#fzf --fish | source
 
 #this wont work for now 
 #todo: need debuginh

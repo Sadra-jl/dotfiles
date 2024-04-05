@@ -25,6 +25,7 @@ alias l.='eza -a | grep -E "^\."'
 alias unlock='sudo rm /var/lib/pacman/db.lck'    # remove pacman lock
 
 alias fzf='fzf --preview "bat --color=always --style=numbers --line-range=:500 {}"'
+
 # adding flags
 alias df='df -h'                          # human-readable sizes
 alias free='free -m'                      # show sizes in MB

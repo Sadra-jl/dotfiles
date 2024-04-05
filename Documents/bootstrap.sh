@@ -401,10 +401,12 @@ it is recommended to run the application in terminal for the first time to see l
         WARN "this operation may take a long time for downloading missing wine components like .net 4.8 .net 4.0 and windows dlls... (be patient)"
         head -n-1 /usr/bin/musicbee | bash
 
-        local theme_path="$HOME/.musicbee/wine/drive_c/users/$USER/AppData/Roaming/MusicBee/Skins/One-Dark.xmlc"
+        local theme_dir="$HOME/.musicbee/wine/drive_c/users/$USER/AppData/Roaming/MusicBee"
+        local theme_path="$theme_dir/Skins/One-Dark.xmlc"
 
         if ! [ -f "$theme_path" ]; then
             INFO "downloading one-dark theme."
+            mkdir -p "$theme_path/Skins"
             http -d -o "$theme_path" "https://github.com/ThatEpicBanana/mb-onedark/releases/download/release/One-Dark.xmlc"
             echo2
         fi

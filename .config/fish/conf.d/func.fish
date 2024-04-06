@@ -24,11 +24,15 @@ function help -d "show app_name --help in bat"
     command $argv --help 2>&1 | bat --plain --language=help
 end
 
-function fz -d "fast directory change with fzf and zoxide"
+function cdf -d "fast directory change with fzf and zoxide"
     # command __zoxide_cd $(find . -type d -print | fzf)
      __zoxide_cd && __zoxide_cd $(fd -0 --type d --ignore-file ~/.config/fd/ignore --hidden | fzf --read0)
 end
 
 function lvimf -d "fast lunarvim open with fzf"
     command lvim $(fzf)
+end
+
+function batf -d "fast lunarvim open with fzf"
+    command bat $(fd -0 --type f --hidden | fzf --read0)
 end

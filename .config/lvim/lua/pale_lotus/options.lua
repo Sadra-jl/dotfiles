@@ -18,8 +18,15 @@ map("i", "<C-E>", "<ESC>A")
 lvim.keys.normal_mode["gt"] = ":BufferLineCycleNext<CR>"
 lvim.keys.normal_mode["gT"] = ":BufferLineCyclePrev<CR>"
 
-vim.opt.shiftwidth = 4
+--options
+local opts = {
+    shiftwidth = 4,
+    relativenumber = true,
+    number = true,
+    statuscolumn = "%s %l %r"
+}
 
---help with jumping.
---vim.opt.relativenumber = true
+for name, value in pairs(opts) do
+  vim.opt[name] = value
+end
 

@@ -512,6 +512,16 @@ EOT
   fi
   cd "$cwd"
 
+    INFO "installing startship"
+    curl -sS https://starship.rs/install.sh | sh
+   if ! grep 'starship init fish | source' ~/.config/fish/config.fish &> /dev/null; then
+       echo 'starship init fish | source' >> ~/.config/fish/config.fish
+   fi
+
+   if ! grep 'starship init bash' ~/.bashrc &> /dev/null; then
+       echo -e "eval \"$(starship init bash)\"" >> ~/.bashrc
+   fi
+
   if ask_prompt "create a git for your configurations? you can add your dotfiles in it and sync with bare git. (y/n)"; then
 
     git "init --bare $HOME/.cfg"

@@ -85,3 +85,6 @@ complete -f -c dotnet -a "(dotnet complete (commandline -cp))"
 # 	set -U FIRST_FISH_RUN
 # 	neofetch
 # end
+
+
+starship init fish | source

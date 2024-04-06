@@ -418,8 +418,46 @@ press ALT to open toolbar select view then select Skin then select One-Dark them
 
 }
 
-configure_system(){
+configure_bare_git(){
+  if ask_prompt "create a git for your configurations? you can add your dotfiles in it and sync with bare git. (y/n)"; then
 
+    git "init --bare $HOME/.cfg"
+
+    /usr/bin/git "--git-dir=$HOME/.cfg/ --work-tree=$HOME config --local status.showUntrackedFiles no"
+
+    echo "alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'" >> "$HOME/.config/fish/conf.d/alias.fish"
+
+    INFO "login to github."
+
+    gh auth login
+
+    local usrname
+    usrname=$(gh api /user | jq -r '.login')
+
+    Yellow "Please create a repository in git hub. do not add readme, license or .gitignore the name can be '(dotfiles configs myConfigs .configs .cfg ...)'"
+    Blue "press Enter the name of repository you created"
+    read -r -p "name of repository: " repo_name
+
+    local current_dir
+    current_dir=$(pwd)
+
+    local repo_url
+    repo_url=$("https://github.com/$usrname/$repo_name.git")
+
+    cd "$HOME/.cfg"
+
+    touch test
+
+    config add test
+    config commit -m "this is a test"
+    config push
+
+    git remote add origin "$repo_url"
+    git push origin
+  fi
+}
+
+configure_system(){
   #chnge shell for user
   #i dont like this if statement
   if ask_prompt "change shell to fish? y/n:  "; then
@@ -508,10 +546,11 @@ EOT
   cd "$HOME/.config/fish/conf.d/"
 
   if ! [ -f ./procs.fish ]; then
-  procs --gen-completion fish
+    procs --gen-completion fish
   fi
   cd "$cwd"
 
+   #add starship
     INFO "installing startship"
     curl -sS https://starship.rs/install.sh | sh
    if ! grep 'starship init fish | source' ~/.config/fish/config.fish &> /dev/null; then
@@ -522,43 +561,13 @@ EOT
        echo -e "eval \"$(starship init bash)\"" >> ~/.bashrc
    fi
 
-  if ask_prompt "create a git for your configurations? you can add your dotfiles in it and sync with bare git. (y/n)"; then
+   configure_bare_git
 
-    git "init --bare $HOME/.cfg"
-
-    /usr/bin/git "--git-dir=$HOME/.cfg/ --work-tree=$HOME config --local status.showUntrackedFiles no"
-
-    echo "alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'" >> "$HOME/.config/fish/conf.d/alias.fish"
-
-    INFO "login to github."
-
-    gh auth login
-
-    local usrname
-    usrname=$(gh api /user | jq -r '.login')
-
-    Yellow "Please create a repository in git hub. do not add readme, license or .gitignore the name can be '(dotfiles configs myConfigs .configs .cfg ...)'"
-    Blue "press Enter the name of repository you created"
-    read -r -p "name of repository: " repo_name
-
-    local current_dir
-    current_dir=$(pwd)
-
-    local repo_url
-    repo_url=$("https://github.com/$usrname/$repo_name.git")
-
-    cd "$HOME/.cfg"
-
-    touch test
-
-    config add test
-    config commit -m "this is a test"
-    config push
-
-    git remote add origin "$repo_url"
-    git push origin
-  fi
+    sudo systemctl enable bluetooth.service
+    sudo systemctl enable --now bluetooth
 }
+
+
 install_scintific(){
 
 

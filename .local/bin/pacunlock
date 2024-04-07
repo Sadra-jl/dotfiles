@@ -1,0 +1,11 @@
+#! /bin/bash
+
+db_path=/var/lib/pacman/db.lck
+
+if [ -f $db_path ]; then
+    sudo rm $db_path
+    echo "Unlocked."
+    return
+fi
+
+echo "Database is not locked."

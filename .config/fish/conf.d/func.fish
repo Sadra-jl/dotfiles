@@ -36,3 +36,4 @@ end
 function batf -d "fast lunarvim open with fzf"
     command bat $(fd -0 --type f --hidden | fzf --read0)
 end
+

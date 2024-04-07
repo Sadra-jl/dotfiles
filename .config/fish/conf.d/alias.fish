@@ -19,10 +19,9 @@ alias lti='eza -al --sort=modified'
 
 # tree listing
 alias lt='eza -aT --color=always --group-directories-first'
+alias tree='eza --tree --color=always'
 
 alias l.='eza -a | grep -E "^\."'
-
-alias unlock='sudo rm /var/lib/pacman/db.lck'    # remove pacman lock
 
 alias fzf='fzf --preview "bat --color=always --style=numbers --line-range=:500 {}"'
 
@@ -56,3 +55,6 @@ alias confcommit='config commit -m'
 ## get error messages from journalctl
 alias jctl="journalctl -p 3 -xb"
 
+alias ply=". ply"
+
+alias icat="kitten icat"

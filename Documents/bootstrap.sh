@@ -454,6 +454,8 @@ configure_bare_git(){
 
     git remote add origin "$repo_url"
     git push origin
+    cd "$OLDPWD"
+
   fi
 }
 
@@ -490,7 +492,7 @@ change it yourself after installation"
     cd windows-persian-keyboard-for-linux
     sudo chmod +x ./install
     sudo ./install
-    cd ..
+    cd "$OLDPWD"
     sudo rm -r windows-persian-keyboard-for-linux
     INFO "moving on..."
   fi
@@ -540,15 +542,13 @@ EOT
   sudo rm -rf /usr/share/sddm/themes/{elarun, maldives, maya} || { ERROR "Removal of unwanted folders failed (sddm).";  }
 
   #configuring procs
-  local cwd
-  cwd=$(pwd)
 
   cd "$HOME/.config/fish/conf.d/"
 
   if ! [ -f ./procs.fish ]; then
     procs --gen-completion fish
   fi
-  cd "$cwd"
+  cd "$OLDPWD"
 
    #add starship
     INFO "installing startship"
@@ -725,13 +725,13 @@ install_linq_pad(){
 
   mkdir "$temp_dir" && cd "$temp_dir"
 
-      http -d -o LINQPad_7.7.15.rar https://dl3.downloadly.ir/Files/Software/LINQPad_7.7.15_Premium_Downloadly.ir.rar
+  http -d -o LINQPad_7.7.15.rar https://dl3.downloadly.ir/Files/Software/LINQPad_7.7.15_Premium_Downloadly.ir.rar
 
-      unrar x LINQPad_7.7.15.rar .
+  unrar x LINQPad_7.7.15.rar .
 
-      cd "./LINQPad 7.7.15 Premium/"
+  cd "./LINQPad 7.7.15 Premium/"
 
-      WARN "this is a windows app installer you must install it with it's GUI it's recommended to not change defualt path. "
+  WARN "this is a windows app installer you must install it with it's GUI it's recommended to not change defualt path. "
 
   local message="press return to countinue."
   echo -en "$blue$message$reset" >&2

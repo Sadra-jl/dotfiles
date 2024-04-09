@@ -1,9 +1,0 @@
-#!/bin/fish
-
-set path "/playground/$1/"
-
-if ! test -d $path 
-    sudo mkdir -p  $path && sudo chown (whoami) $path
-end
-
-cd $path; or exit 1

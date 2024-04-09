@@ -55,6 +55,4 @@ alias confcommit='config commit -m'
 ## get error messages from journalctl
 alias jctl="journalctl -p 3 -xb"
 
-alias ply=". ply"
-
 alias icat="kitten icat"

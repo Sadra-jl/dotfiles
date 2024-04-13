@@ -1,3 +1,5 @@
+local _set = require("pale_lotus.utilities.table_utils").set
+
 --keymaps
 local function map(mode, key, value, description)
     if description == nil then
@@ -30,8 +32,13 @@ for name, value in pairs(opts) do
   vim.opt[name] = value
 end
 
+local fish_paths = _set({
+    "/usr/bin/fish",
+    "/bin/fish"
+})
+
 -- If the current system shell or the `shell` option is set to /usr/bin/fish then revert to sh
-if os.getenv('SHELL') == "/usr/bin/fish" or vim.opt.shell == "/usr/bin/fish" then
+if fish_paths[os.getenv('SHELL')]  or fish_paths[vim.opt.shell] then
     vim.opt.shell = "/bin/bash"
 else
    -- Else default to the system current shell.

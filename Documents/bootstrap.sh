@@ -52,7 +52,6 @@ scientific_packages=(maxima geogebra kalzium kbibtex kstars labplot mathematica 
 
 steam_packages=(steam lutris steam-native-runtime dxvk-bin vkd3d-proton winetricks pipewire-pulse)
 
-invidia_packages=(nvidia-dkms nvidia-utils lib32-nvidia-utils nvidia-settings)
 
 #--------------------------------functions-----------------------------------
 
@@ -481,54 +480,109 @@ configure_btrfs() {
 }
 
 configure_cpu(){
+    # Trim whitespaces from the CPU vendor
+    cpu_info=$(lscpu)
 
-# Trim whitespaces from the CPU vendor
-cpu_info=$(lscpu)
+    # Debug print to check CPU info
+    #echo "CPU Info: $cpu_info"
 
-# Debug print to check CPU info
-#echo "CPU Info: $cpu_info"
+    # ---------------------------------------------------------------------
+    # Check CPU vendor and execute AMD-specific code if AMD CPU is detected
+    # ---------------------------------------------------------------------
 
-# ---------------------------------------------------------------------
-# Check CPU vendor and execute AMD-specific code if AMD CPU is detected
-# ---------------------------------------------------------------------
+    cpu_vendor=$(lscpu | grep "Vendor ID" | awk '{print $3}')
 
-cpu_vendor=$(lscpu | grep "Vendor ID" | awk '{print $3}')
+    if [ "$cpu_vendor" == "AuthenticAMD" ]; then
+        INFO  "AMD CPU detected.$reset Running AMD-specific code..."
 
-if [ "$cpu_vendor" == "AuthenticAMD" ]; then
-    INFO  "AMD CPU detected.$reset Running AMD-specific code..."
-
-    # Check if amd-ucode is installed
-    if echo "$cpu_info" | grep -qi "AuthenticAMD"; then
-        INFO "amd-ucode is installed."
-        # Add your AMD-specific code here
-    else
-        WARN "amd-ucode is not installed. Please install it for optimal performance."
-        # Add code to install amd-ucode if desired
+        # Check if amd-ucode is installed
+        if echo "$cpu_info" | grep -qi "AuthenticAMD"; then
+            INFO "amd-ucode is installed."
+            # Add your AMD-specific code here
+        else
+            WARN "amd-ucode is not installed. Please install it for optimal performance."
+            # Add code to install amd-ucode if desired
+        fi
     fi
-fi
 
-# -------------------------------------------------------------------
-# Check CPU vendor and execute INTEL-specific code if CPU is detected
-# -------------------------------------------------------------------
+    # -------------------------------------------------------------------
+    # Check CPU vendor and execute INTEL-specific code if CPU is detected
+    # -------------------------------------------------------------------
 
-if [ "$cpu_vendor" == "GenuineIntel" ]; then
-    INFO "INTEL CPU detected.${reset} Running INTEL-specific code..."
+    if [ "$cpu_vendor" == "GenuineIntel" ]; then
+        INFO "INTEL CPU detected.${reset} Running INTEL-specific code..."
 
-    # Check if intel-ucode is installed
-    if pacman -Qi intel-ucode &> /dev/null; then
-        INFO "intel-ucode is installed."
-        # Add your INTEL-specific code here
-    else
-        WARN "intel-ucode is not installed. Please install it for optimal performance."
-        # Add code to install intel-ucode if desired
+        # Check if intel-ucode is installed
+        if pacman -Qi intel-ucode &> /dev/null; then
+            INFO "intel-ucode is installed."
+            # Add your INTEL-specific code here
+        else
+            WARN "intel-ucode is not installed. Please install it for optimal performance."
+            # Add code to install intel-ucode if desired
+        fi
     fi
-fi
 }
+
+configure_grub(){
+    INFO "Please be patient; we are doing a last check to see if GRUB is correctly configured for your hyprland installation with an NVIDIA GPU."
+    INFO "For safety reasons, we are now making a backup of the GRUB configuration. See /etc/default/grub.bak"
+
+    backup /etc/default/grub
+
+    # Check if the nvidia-drm.modeset=1 option is present in GRUB_CMDLINE_LINUX
+    if  grep -q "nvidia-drm.modeset=1" /etc/default/grub; then
+        INFO "GRUB_CMDLINE_LINUX already contains nvidia-drm.modeset=1. No changes needed."
+        return
+    fi
+    # Append the option if it's not present
+    sudo sed -i 's/GRUB_CMDLINE_LINUX="\(.*\)"/GRUB_CMDLINE_LINUX="\1 nvidia-drm.modeset=1"/' /etc/default/grub
+
+    # Regenerate GRUB configuration
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+    INFO "Added nvidia-drm.modeset=1 to GRUB_CMDLINE_LINUX."
+
+    # Update GRUB only if changes are made
+    sudo update-grub
+}
+
+configure_nvidia()
+{
+    # ------------------------------------------------------
+    # Check if Nvidia GPU is present
+    # ------------------------------------------------------
+    if ! eval "$(lspci | grep -i "NVIDIA" > /dev/null)"; then
+        INFO "No Nvidia GPU detected. Skipping installation of Nvidia-specific packages."
+        return
+    fi
+        INFO "Nvidia GPU detected. Installing Nvidia packages..."
+
+    # Install Nvidia-specific packages
+    nvidia_packages=("libva" "libva-nvidia-driver-git" "nvidia-dkms" "nvidia-utils" "lib32-nvidia-utils" "nvidia-settings")
+
+    for package in "${nvidia_packages[@]}"; do
+        if pacman -Qi "$package" &> /dev/null; then
+            INFO "$package is already installed. Skipping."
+        else
+            # Install the package
+            if yay -S --noconfirm "$package"; then
+                INFO "$package installed."
+            else
+                ERROR "Failed to install $package. Manual intervention may be required."
+                exit 1
+            fi
+        fi
+    done
+
+    configure_grub
+}
+
 
 configure_system() {
 
   configure_btrfs
   configure_cpu
+  configure_nvidia
 
   #chnge shell for user
   #i dont like this if statement
@@ -879,11 +933,6 @@ EOT
   install_linq_pad
 }
 
-install_invidia_packages() {
-  ! eval "$(ask_prompt "are you an invidia user?(y/n): ")" && return
-
-  install_packages invidia_packages "yes"
-}
 
 #--------------------------------main-----------------------------------
 
@@ -967,10 +1016,6 @@ EOF
 
   Yellow "---------------------------------------Installing Basic packages--------------------------------------"
   install_packages pkgs "yes"
-  echo2
-
-  Yellow "------------------------------------------Nvidia packages---------------------------------------------"
-  install_packages invidia_packages
   echo2
 
   Yellow "-----------------------------------------configuring system-------------------------------------------"

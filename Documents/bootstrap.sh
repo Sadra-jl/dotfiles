@@ -15,8 +15,6 @@
 #⠀⠀⠀⠀⠀⠀⠈⠛⠧⠘⣿⣿⣿⣿⣿⣿⣿⣿⡿⠁⠼⠋⠁⠀⠀⠀⠀⠀⠀⠀
 #⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⠛⠛⠛⠛⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 
-
-
 #hello, world
 #
 # The execution of this script stops if a command or pipeline has an error.
@@ -44,7 +42,7 @@ reset="\033[0m"
 
 #list of packages to install
 
-pkgs=(bluez bluez-utils musicbee wl-clipboard typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf betterdiscordctl-git skypeforlinux-bin timeshift calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-btrfs grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch )
+pkgs=(zathura zathura-djvu zathura-pdf-mupdf bluez bluez-utils musicbee wl-clipboard typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf betterdiscordctl-git skypeforlinux-bin timeshift calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-btrfs grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch)
 
 #todo add dnSpyEx (hard to get it working on linux)
 dotnet_packages=(dotnet-host-bin dotnet-runtime-bin dotnet-sdk-bin dotnet-targeting-pack-bin)
@@ -54,8 +52,7 @@ scientific_packages=(maxima geogebra kalzium kbibtex kstars labplot mathematica 
 
 steam_packages=(steam lutris steam-native-runtime dxvk-bin vkd3d-proton winetricks pipewire-pulse)
 
-invidia_packages=(nvidia-dkms nvidia-utils lib32-nvidia-utils nvidia-settings )
-
+invidia_packages=(nvidia-dkms nvidia-utils lib32-nvidia-utils nvidia-settings)
 
 #--------------------------------functions-----------------------------------
 
@@ -67,37 +64,37 @@ invidia_packages=(nvidia-dkms nvidia-utils lib32-nvidia-utils nvidia-settings )
 # it will fail and ; must be inserted like bellow form
 # "func_name() {commands;}"
 
-echo2()   { echo -e  "$@" >&2 ; }
+echo2() { echo -e "$@" >&2; }
 
 # following 30 lines is from endeavourOs scripts im sure this error is not a big deal and will work
-Red(){ echo2 "$red""$@""$reset"; }
-Yellow(){ echo2 "$yellow""$@""$reset"; }
-Blue(){ echo2 "$blue""$@""$reset"; }
+Red() { echo2 "$red""$@""$reset"; }
+Yellow() { echo2 "$yellow""$@""$reset"; }
+Blue() { echo2 "$blue""$@""$reset"; }
 
 WARN() {
-    local msg="$1"
-    Yellow "==> : warning: $msg"
+  local msg="$1"
+  Yellow "==> : warning: $msg"
 }
 INFO() {
-    local msg="$1"
-    local prefix="$2"
-    case "$prefix" in
-        "") Blue "==> info: $msg" ;;
-        *)  Blue "$prefix$msg" ;;
-    esac
+  local msg="$1"
+  local prefix="$2"
+  case "$prefix" in
+  "") Blue "==> info: $msg" ;;
+  *) Blue "$prefix$msg" ;;
+  esac
 }
 ERROR() {
-    local metadata="$1"
-    local realdata="$2"
-    Red "==> error: $metadata"
-    [ "$realdata" ] && Red "    $realdata"
+  local metadata="$1"
+  local realdata="$2"
+  Red "==> error: $metadata"
+  [ "$realdata" ] && Red "    $realdata"
 }
 
 ShowArray() {
-    local item
-    for item in "$@" ; do
-        echo "$item"
-    done
+  local item
+  for item in "$@"; do
+    echo "$item"
+  done
 }
 
 usage() {
@@ -117,48 +114,45 @@ EOF
 
 }
 
-
 # Function to backup a file or directory
 backup() {
-    local item="$1"
-    local backup_dir="$item.back"
+  local item="$1"
+  local backup_dir="$item.back"
 
-    # If .back already exists, find the next available numeric suffix
-    suffix=1
-    while [ -e "$backup_dir$suffix" ]; do
-        ((suffix++))
-    done
+  # If .back already exists, find the next available numeric suffix
+  suffix=1
+  while [ -e "$backup_dir$suffix" ]; do
+    ((suffix++))
+  done
 
-    mv "$item" "$backup_dir$suffix"
+  mv "$item" "$backup_dir$suffix"
 }
 
 #ask user yes no questions
- ask_prompt() {
+ask_prompt() {
 
   local message=$1
 
   while true; do
 
     echo -en "$blue$message$reset" >&2
-    read -r  yn
+    read -r yn
 
     case $yn in
-        [Yy]* ) return 0;;
-        [Nn]* ) return 1;;
-        * ) ERROR "Please answer yes or no.";;
+    [Yy]*) return 0 ;;
+    [Nn]*) return 1 ;;
+    *) ERROR "Please answer yes or no." ;;
     esac
   done
- }
+}
 
+#ask user if they want to install optional packages
 
-
- #ask user if they want to install optional packages
-
- #for some unknown reasons I encuntered odd behavieours bash's logical not ("!") is not doing its job with " ! func_name args"
- #and gives  "unary operator expected" exception so the best way to do this is to do the hard way of writeing all of the statements
- #in if statement and add an unwanted tab instaed of writeing it like " 	[ ! function_name args ] && return"
- #it's not a big deal as long as no body is involved to help
- #or maybe seprate function call and if statement and then use if
+#for some unknown reasons I encuntered odd behavieours bash's logical not ("!") is not doing its job with " ! func_name args"
+#and gives  "unary operator expected" exception so the best way to do this is to do the hard way of writeing all of the statements
+#in if statement and add an unwanted tab instaed of writeing it like " 	[ ! function_name args ] && return"
+#it's not a big deal as long as no body is involved to help
+#or maybe seprate function call and if statement and then use if
 
 #3/16/24 update:
 #	it turns out wrapping function and its arguments with $() will solve the problem :)
@@ -167,12 +161,12 @@ backup() {
 #	using eval will get the mentioned error so maybe add it like eval "$()" and ask for help maybe?
 #	I will move on for now.
 
- install_optional_package(){
+install_optional_package() {
   local package_name=$1
   local -n package_options=$2
   local description=$3
 
-   ! eval "$( ask_prompt "install $package_name? y/n:  ")"  && return
+  ! eval "$(ask_prompt "install $package_name? y/n:  ")" && return
 
   WARN "apps to install options are:	"
 
@@ -185,9 +179,9 @@ backup() {
   selected=()
 
   PS3='You can select multiple space separated options: '
-  select options in "${package_options[@]}" ; do
-    for reply in $REPLY ; do
-    selected+=(${package_options[reply - 1]})
+  select options in "${package_options[@]}"; do
+    for reply in $REPLY; do
+      selected+=(${package_options[reply - 1]})
     done
     [[ $selected ]] && break
   done
@@ -195,9 +189,8 @@ backup() {
   yay -S --needed --noconfirm "${selected[@]}"
 }
 
-
- change_dns(){
-   ! eval "$( ask_prompt "use Beshkan DNS servers to bypass restriction?$reset ($yellow this will disable NetworkManager auto DNS assignment$reset) y/n:	")" && return
+change_dns() {
+  ! eval "$(ask_prompt "use Beshkan DNS servers to bypass restriction?$reset ($yellow this will disable NetworkManager auto DNS assignment$reset) y/n:	")" && return
 
   backup /etc/NetworkManager/NetworkManager.conf
   echo -e "[Main]\ndns=none\n#plugins=ifcfg-rh,ibft" | sudo tee -a /etc/NetworkManager/NetworkManager.conf
@@ -210,7 +203,7 @@ backup() {
   echo -e "nameserver 181.41.194.177\nnameserver 181.41.194.186" | sudo tee -a /etc/resolv.conf
 }
 
-fisher_installer(){
+fisher_installer() {
   local -n packages=$1
 
   for package in "${packages[@]}"; do
@@ -221,7 +214,7 @@ fisher_installer(){
   done
 }
 
-install_fish_plugins(){
+install_fish_plugins() {
 
   local plugins=("PatrickF1/fzf.fish" "franciscolourenco/done" "jorgebucaran/spark.fish" "jorgebucaran/autopair.fish" "nickeb96/puffer-fish" "meaningful-ooo/sponge")
 
@@ -233,7 +226,7 @@ install_fish_plugins(){
   fi
 }
 
-configure_zoxide(){
+configure_zoxide() {
 
   local bash_config
   bash_config="eval \"$(zoxide init bash)\""
@@ -244,13 +237,12 @@ configure_zoxide(){
 
   INFO "configuring zoxide..."
 
-
-  if ! grep "$bash_config" ~/.bashrc &> /dev/null; then
-    echo "$bash_config" >> ~/.bashrc
+  if ! grep "$bash_config" ~/.bashrc &>/dev/null; then
+    echo "$bash_config" >>~/.bashrc
   fi
 
-  if ! grep "$fish_config" ~/.config/fish/config.fish &> /dev/null; then
-    echo "$fish_config" >> ~/.config/fish/config.fish
+  if ! grep "$fish_config" ~/.config/fish/config.fish &>/dev/null; then
+    echo "$fish_config" >>~/.config/fish/config.fish
   fi
 
   if ask_prompt "set an alias for cd to zoxide? (fish shell only) (y/n):  "; then
@@ -261,16 +253,16 @@ configure_zoxide(){
     #is that by defualt all .fish files in ~/.config/fish/conf.d/ will be run before ~/.config/fish/config.fish
     #and abow situation might occur when accidently sourcing multiple files or config.fish more
     #than once
-    
-    if ! eval "$(grep 'alias cd="z"' ~/.config/fish/config.fish)" &> /dev/null; then
-      echo -e 'alias cd="z"\n' >> ~/.config/fish/config.fish
+
+    if ! eval "$(grep 'alias cd="z"' ~/.config/fish/config.fish)" &>/dev/null; then
+      echo -e 'alias cd="z"\n' >>~/.config/fish/config.fish
     fi
 
     INFO "done"
   fi
 }
 
-install_packages(){
+install_packages() {
 
   local -n packages_to_install=$1
   local terminate_app_str=$2
@@ -281,15 +273,14 @@ install_packages(){
   #readarray -d " " -t array <<< "$packages_to_install"
 
   #for (( n=0; n < ${#array[*]}; n++)) do
-    #echo -e "\t${array[n]}"
+  #echo -e "\t${array[n]}"
   #done
 
   for pkg in "${packages_to_install[@]}"; do
     echo -e "\t$pkg"
   done
 
-
-  if ! eval "$( ask_prompt "press y to continue:  ")"; then
+  if ! eval "$(ask_prompt "press y to continue:  ")"; then
     if [ "$terminate_app_str" = "yes" ]; then
       WARN "this packages are important to for furthur installation and are 50% of what this script is about
 if you accidently passed no its time control+c now and start over."
@@ -304,17 +295,15 @@ if you accidently passed no its time control+c now and start over."
   yay -S --needed "$pacman_confirm" "${packages_to_install[@]}"
 }
 
-
- optional_packages(){
+optional_packages() {
 
   #descriptions
-  
+
   local pycharm_description="pycharm eap is professinal version where pycharm community is not.
 using pycharm eap does not need any licencing as eap stands for early access program
 its license trial is 30 days and you have to update to next eap.
 
   by installing pycharm professinal you need to have license (or get it in other ways ;) )"
-
 
   local edge_description="stable verstion as it says is stable one, dev edition is bleeding edge..."
 
@@ -327,7 +316,6 @@ other optoin is also a great app if you plan to use Hyprland why not install bot
 clear yay cach with yay -Scc and install package manually$reset"
 
   local torrent_client_description="KTorrent is a feature rich torrent/mega downloader from kde family and has strong bound with kde echo-system. qBitTorrent is more independent both are great choices qBitTorrent is more recommended"
-
 
   local ffmpeg_despription="FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video.
 ffmpeg-full is built with as many optional features enabled as possible so it will take a lot of resources to compile; where
@@ -342,7 +330,7 @@ ffmpeg is binary precompiled from arch repository not arch user repository"
   install_optional_package "microsoft-edge" edge_editsion "$edge_description"
 
   #***office***
-  office_editsion=(libreoffice-fresh onlyoffice-bin )
+  office_editsion=(libreoffice-fresh onlyoffice-bin)
   install_optional_package "office bunble" office_editsion "$office_description"
 
   #***ffmpeg***
@@ -363,9 +351,9 @@ ffmpeg is binary precompiled from arch repository not arch user repository"
   #install joplin
   #if ask_prompt "install joplin? (note taking app) (y/n):  "; then
 
-        #wget -O - https://raw.githubusercontent.com/laurent22/joplin/dev/Joplin_install_and_update.sh | bash
-    #NPM_CONFIG_PREFIX=~/.joplin-bin npm install -g joplin
-    #sudo ln -s ~/.joplin-bin/bin/joplin /usr/bin/joplin
+  #wget -O - https://raw.githubusercontent.com/laurent22/joplin/dev/Joplin_install_and_update.sh | bash
+  #NPM_CONFIG_PREFIX=~/.joplin-bin npm install -g joplin
+  #sudo ln -s ~/.joplin-bin/bin/joplin /usr/bin/joplin
   #fi
 
   #install download manager
@@ -382,50 +370,49 @@ ffmpeg is binary precompiled from arch repository not arch user repository"
     sudo pacman -S "lyx texmaker"
   fi
 
-
-  if ask_prompt "install steam? (y/n):	";then
-        local message="for this operation you need to specify your cpu/gpu press return to countinue."
-        echo -en "$blue$message$reset" >&2
-        read -r
+  if ask_prompt "install steam? (y/n):	"; then
+    local message="for this operation you need to specify your cpu/gpu press return to countinue."
+    echo -en "$blue$message$reset" >&2
+    read -r
 
     install_packages steam_packages "--confirm"
-    fi
+  fi
 
-    if ask_prompt "install musicbee?(best windows music player working with wine)"; then
-        yay --needed --noconfirm -S musicbee
+  if ask_prompt "install musicbee?(best windows music player working with wine)"; then
+    yay --needed --noconfirm -S musicbee
 
-        WARN "running app for the first time 
+    WARN "running app for the first time 
 it is recommended to run the application in terminal for the first time to see logs. (and potential errors)"
-        
-        INFO "creating wine prefix."
-        WARN "this operation may take a long time for downloading missing wine components like .net 4.8 .net 4.0 and windows dlls... (be patient)"
-        head -n-1 /usr/bin/musicbee | bash
 
-        local theme_dir="$HOME/.musicbee/wine/drive_c/users/$USER/AppData/Roaming/MusicBee"
-        local theme_path="$theme_dir/Skins/One-Dark.xmlc"
+    INFO "creating wine prefix."
+    WARN "this operation may take a long time for downloading missing wine components like .net 4.8 .net 4.0 and windows dlls... (be patient)"
+    head -n-1 /usr/bin/musicbee | bash
 
-        if ! [ -f "$theme_path" ]; then
-            INFO "downloading one-dark theme."
-            mkdir -p "$theme_path/Skins"
-            http -d -o "$theme_path" "https://github.com/ThatEpicBanana/mb-onedark/releases/download/release/One-Dark.xmlc"
-            echo2
-        fi
-        
-        echo2 "$yellow""the defualt app's theme is a bit weird on linux One-Dark theme have been downloaded in skin folder all you have to do is change to it by:
-press ALT to open toolbar select view then select Skin then select One-Dark theme."
-        
+    local theme_dir="$HOME/.musicbee/wine/drive_c/users/$USER/AppData/Roaming/MusicBee"
+    local theme_path="$theme_dir/Skins/One-Dark.xmlc"
+
+    if ! [ -f "$theme_path" ]; then
+      INFO "downloading one-dark theme."
+      mkdir -p "$theme_path/Skins"
+      http -d -o "$theme_path" "https://github.com/ThatEpicBanana/mb-onedark/releases/download/release/One-Dark.xmlc"
+      echo2
     fi
+
+    echo2 "$yellow""the defualt app's theme is a bit weird on linux One-Dark theme have been downloaded in skin folder all you have to do is change to it by:
+press ALT to open toolbar select view then select Skin then select One-Dark theme."
+
+  fi
 
 }
 
-configure_bare_git(){
+configure_bare_git() {
   if ask_prompt "create a git for your configurations? you can add your dotfiles in it and sync with bare git. (y/n)"; then
 
     git "init --bare $HOME/.cfg"
 
     /usr/bin/git "--git-dir=$HOME/.cfg/ --work-tree=$HOME config --local status.showUntrackedFiles no"
 
-    echo "alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'" >> "$HOME/.config/fish/conf.d/alias.fish"
+    echo "alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'" >>"$HOME/.config/fish/conf.d/alias.fish"
 
     INFO "login to github."
 
@@ -459,7 +446,90 @@ configure_bare_git(){
   fi
 }
 
-configure_system(){
+# ------------------------------------------------------
+# Check filesystem type
+# ------------------------------------------------------
+configure_btrfs() {
+
+  local btrfs_packages=("snapper" "snap-pac" "snapper-rollback" "btrfs-assistant" "btrfsmaintenance")
+  filesystem_type=$(findmnt -n -o FSTYPE /)
+
+  if [ "$filesystem_type" != "btrfs" ]; then
+    INFO "Filesystem is not Btrfs. Skipping installation of Btrfs-specific packages."
+    return
+  fi
+
+  # -------------------------------
+  # Install Btrfs-specific packages
+  # -------------------------------
+
+  for package in "${btrfs_packages[@]}"; do
+    if pacman -Qi "$package" &>/dev/null; then
+      WARN "$package is already installed. Skipping."
+    else
+      # -------------------
+      # Install the package
+      # -------------------
+      if yay -S --noconfirm "$package"; then
+        echo "$package installed."
+      else
+        ERROR "Failed to install $package. Manual intervention may be required."
+        exit 1
+      fi
+    fi
+  done
+}
+
+configure_cpu(){
+
+# Trim whitespaces from the CPU vendor
+cpu_info=$(lscpu)
+
+# Debug print to check CPU info
+#echo "CPU Info: $cpu_info"
+
+# ---------------------------------------------------------------------
+# Check CPU vendor and execute AMD-specific code if AMD CPU is detected
+# ---------------------------------------------------------------------
+
+cpu_vendor=$(lscpu | grep "Vendor ID" | awk '{print $3}')
+
+if [ "$cpu_vendor" == "AuthenticAMD" ]; then
+    INFO  "AMD CPU detected.$reset Running AMD-specific code..."
+
+    # Check if amd-ucode is installed
+    if echo "$cpu_info" | grep -qi "AuthenticAMD"; then
+        INFO "amd-ucode is installed."
+        # Add your AMD-specific code here
+    else
+        WARN "amd-ucode is not installed. Please install it for optimal performance."
+        # Add code to install amd-ucode if desired
+    fi
+fi
+
+# -------------------------------------------------------------------
+# Check CPU vendor and execute INTEL-specific code if CPU is detected
+# -------------------------------------------------------------------
+
+if [ "$cpu_vendor" == "GenuineIntel" ]; then
+    INFO "INTEL CPU detected.${reset} Running INTEL-specific code..."
+
+    # Check if intel-ucode is installed
+    if pacman -Qi intel-ucode &> /dev/null; then
+        INFO "intel-ucode is installed."
+        # Add your INTEL-specific code here
+    else
+        WARN "intel-ucode is not installed. Please install it for optimal performance."
+        # Add code to install intel-ucode if desired
+    fi
+fi
+}
+
+configure_system() {
+
+  configure_btrfs
+  configure_cpu
+
   #chnge shell for user
   #i dont like this if statement
   if ask_prompt "change shell to fish? y/n:  "; then
@@ -476,7 +546,7 @@ change it yourself after installation"
   #change shell for root
   #i dont like this code duplication
   if ask_prompt "change shell to fish?($red_b root$reset) y/n:  "; then
-    if sudo chsh --shell "$(which fish)" root ; then
+    if sudo chsh --shell "$(which fish)" root; then
       WARN "shell changed. restart terminal or source profile."
     else
       ERROR "changeing shell to fish failed for the root user \"$(whoami)\"
@@ -502,14 +572,14 @@ change it yourself after installation"
 
     local alias_path=~/.config/fish/conf.d/alias.fish
 
-    if [ -f "$alias_path" ] && [ $( ask_prompt "do you want to backup $alias_path?") ]; then
+    if [ -f "$alias_path" ] && [ $(ask_prompt "do you want to backup $alias_path?") ]; then
       backup "$alias_path"
     fi
 
     touch $alias_path
 
-    if ! grep "alias ls='eza --color=always --sort=size'" ~/.config/fish/conf.d/alias.fish &> /dev/null; then
-    tee -a $alias_path > /dev/null << EOT
+    if ! grep "alias ls='eza --color=always --sort=size'" ~/.config/fish/conf.d/alias.fish &>/dev/null; then
+      tee -a $alias_path >/dev/null <<EOT
 alias ls='eza --color=always --sort=size'
 
 #list only directories
@@ -538,8 +608,7 @@ EOT
 
   configure_zoxide
 
-
-  sudo rm -rf /usr/share/sddm/themes/{elarun, maldives, maya} || { ERROR "Removal of unwanted folders failed (sddm).";  }
+  sudo rm -rf /usr/share/sddm/themes/{elarun, maldives, maya} || { ERROR "Removal of unwanted folders failed (sddm)."; }
 
   #configuring procs
 
@@ -550,28 +619,26 @@ EOT
   fi
   cd "$OLDPWD"
 
-   #add starship
-    INFO "installing startship"
-    curl -sS https://starship.rs/install.sh | sh
-   if ! grep 'starship init fish | source' ~/.config/fish/config.fish &> /dev/null; then
-       echo 'starship init fish | source' >> ~/.config/fish/config.fish
-   fi
+  #add starship
+  INFO "installing startship"
+  curl -sS https://starship.rs/install.sh | sh
+  if ! grep 'starship init fish | source' ~/.config/fish/config.fish &>/dev/null; then
+    echo 'starship init fish | source' >>~/.config/fish/config.fish
+  fi
 
-   if ! grep 'starship init bash' ~/.bashrc &> /dev/null; then
-       echo -e "eval \"$(starship init bash)\"" >> ~/.bashrc
-   fi
+  if ! grep 'starship init bash' ~/.bashrc &>/dev/null; then
+    echo -e "eval \"$(starship init bash)\"" >>~/.bashrc
+  fi
 
-   configure_bare_git
+  configure_bare_git
 
-    sudo systemctl enable bluetooth.service
-    sudo systemctl enable --now bluetooth
+  sudo systemctl enable bluetooth.service
+  sudo systemctl enable --now bluetooth
 }
 
+install_scintific() {
 
-install_scintific(){
-
-
-   ! eval "$( ask_prompt "install scientific apps? $yellow you may not need them.$reset (y/n):  ") " &&  return
+  ! eval "$(ask_prompt "install scientific apps? $yellow you may not need them.$reset (y/n):  ") " && return
 
   install_packages scientific_packages "no"
 
@@ -587,7 +654,7 @@ install_scintific(){
   pip install ipyparallel
 }
 
-change_mirrors(){
+change_mirrors() {
 
   ! eval "$(ask_prompt "change mirrors? (rate-mirrors program will be installed) y/n:	")" && return
 
@@ -597,8 +664,8 @@ change_mirrors(){
   ##lets not delete this block to remind us we have problems to solve.
 
   #if ! $( yay -S --needed --noconfirm rate-mirrors) ; then
-    #ERROR "installation of \"rate-mirrors\" failed. try solve the problem manually and try again."
-    #exit
+  #ERROR "installation of \"rate-mirrors\" failed. try solve the problem manually and try again."
+  #exit
   #fi
 
   yay -S --needed --noconfirm rate-mirrors
@@ -606,26 +673,26 @@ change_mirrors(){
   #updating arch mirrorlist
 
   if ask_prompt "do want to backup mirrorlist?(recommended) y/n:	"; then
-    backup /etc/pacman.d/mirrorlist;
+    backup /etc/pacman.d/mirrorlist
   fi
 
   local http="--protocol http"
   local https="--protocol https"
   local protocol="$http $https"
 
-  if ! eval "$( ask_prompt "do you want to include http? y/n:	")" ; then
-    protocol=$https;
+  if ! eval "$(ask_prompt "do you want to include http? y/n:	")"; then
+    protocol=$https
   fi
 
   INFO "updating arch mirrorlist"
   rate-mirrors --allow-root "$protocol" arch | sudo tee /etc/pacman.d/mirrorlist
 
   #updating	endeavourOs mirrorlist
-  ! eval "$( ask_prompt "do you want to update EndeavourOs mirrorlist as well?") " && return
+  ! eval "$(ask_prompt "do you want to update EndeavourOs mirrorlist as well?") " && return
 
-   eval "$( ask_prompt "do want to backup endeavouros-mirrorlist?(recommended) y/n:	") " && backup /etc/pacman.d/endeavouros-mirrorlist
+  eval "$(ask_prompt "do want to backup endeavouros-mirrorlist?(recommended) y/n:	") " && backup /etc/pacman.d/endeavouros-mirrorlist
 
-  if  ask_prompt "do you want to include http? y/n:	"; then
+  if ask_prompt "do you want to include http? y/n:	"; then
     protocol="$http $https"
   else
     protocol=$https
@@ -636,7 +703,7 @@ change_mirrors(){
   rate-mirrors --allow-root "$protocol" endeavouros | sudo tee /etc/pacman.d/endeavouros-mirrorlist
 }
 
- yay_clean_up() {
+yay_clean_up() {
 
   local number_of_lines=$1
 
@@ -663,36 +730,34 @@ change_mirrors(){
   Yellow "--------------------------------------------"
   echo2
 
-
   ! eval "$(ask_prompt "prossed with operation?(y/n):	")" && return
 
   yay -Scc
- }
+}
 
- install_zen_kernel() {
+install_zen_kernel() {
 
+  WARN "zen kernel(or any over kernels over than vanila linux) may have some problems like for example pc may not shutdown properly sometimes. use at your own risk"
+  ! eval "$(ask_prompt "do you want to install and change kernel to zen-kernel? (y/n):	")" && return
 
-    WARN "zen kernel(or any over kernels over than vanila linux) may have some problems like for example pc may not shutdown properly sometimes. use at your own risk"
-    ! eval "$(ask_prompt "do you want to install and change kernel to zen-kernel? (y/n):	")" && return
+  INFO "current kernel: $(uname -r)"
 
-    INFO "current kernel: $(uname -r)"
+  sudo pacman --needed --noconfirm -S linux-zen linux-zen-headers
 
-    sudo pacman --needed --noconfirm -S  linux-zen linux-zen-headers
+  sudo grub-mkconfig -o /boot/grub/grub.cfg
 
-    sudo grub-mkconfig -o /boot/grub/grub.cfg
+  INFO "install complited, check kernel after reboot with 'uname -r' command"
+}
 
-    INFO "install complited, check kernel after reboot with 'uname -r' command"
-  }
-
- install_fonts() {
-  local font_packages=(ttf-firacode ttf-ms-win11-auto ttf-ms-win10-auto ttf-jetbrains-mono-nerd cantarell-fonts ttf-noto-nerd ttf-nerd-fonts-symbols-mono ttf-font-awesome awesome-terminal-fonts ttf-bitstream-vera ttf-dejavu ttf-liberation noto-fonts-extra ttf-opensans adobe-source-sans-pro-fonts terminus-font ttf-droid ttf-hack ttf-ms-fonts steam-fonts)
+install_fonts() {
+  local font_packages=(ttf-fira-code ttc-iosevka ttf-ms-win11-auto ttf-ms-win10-auto ttf-jetbrains-mono-nerd cantarell-fonts ttf-noto-nerd ttf-nerd-fonts-symbols-mono ttf-font-awesome awesome-terminal-fonts ttf-bitstream-vera ttf-dejavu ttf-liberation noto-fonts-extra ttf-opensans adobe-source-sans-pro-fonts terminus-font ttf-droid ttf-hack ttf-ms-fonts steam-fonts)
 
   ! eval "$(ask_prompt "install fonts? (y/n):	")" && return
 
   install_packages font_packages "no"
- }
+}
 
-dotnet_installer(){
+dotnet_installer() {
   local -n packages=$1
 
   for package in "${packages[@]}"; do
@@ -703,8 +768,8 @@ dotnet_installer(){
   done
 }
 
-install_dotnet_tools(){
-   ! eval "$( ask_prompt "install dotnet cli tools? (y/n):  ") " && return
+install_dotnet_tools() {
+  ! eval "$(ask_prompt "install dotnet cli tools? (y/n):  ") " && return
 
   sudo dotnet workload update
 
@@ -715,7 +780,7 @@ install_dotnet_tools(){
   dotnet_installer plugins
 }
 
-install_linq_pad(){
+install_linq_pad() {
   ! eval "$(ask_prompt "install linq pad? (dotnet play ground good for sql; wine must been installed) (y/n):	")" && return
 
   local current_dir
@@ -737,9 +802,9 @@ install_linq_pad(){
   echo -en "$blue$message$reset" >&2
   read -r
 
-  wine LINQPad7Setup_Downloadly.ir.exe &> /dev/null
+  wine LINQPad7Setup_Downloadly.ir.exe &>/dev/null
 
-  cp -rf Crack/* "$HOME/.wine/drive_c/Program Files/LINQPad7/" &> /dev/null
+  cp -rf Crack/* "$HOME/.wine/drive_c/Program Files/LINQPad7/" &>/dev/null
 
   cd "$temp_dir"
 
@@ -751,7 +816,7 @@ install_linq_pad(){
   echo -en "$blue$message$reset" >&2
   read -r
 
-  wine ./windowsdesktop-runtime-7.0.17-win-x64.exe &> /dev/null
+  wine ./windowsdesktop-runtime-7.0.17-win-x64.exe &>/dev/null
 
   INFO "writeing wine registery."
   INFO "setting DOTNET_ROOT=C:\PROGRAM FILES\dotnet"
@@ -763,32 +828,32 @@ install_linq_pad(){
   cd "$current_dir"
 }
 
- install_dotnet() {
+install_dotnet() {
 
   local rider_description="rider eap is professinal version where rider is not.
 using rider eap does not need any licencing as eap stands for early access program
 its license trial is 30 days and you have to update to next eap.
 by installing rider you need to have license (or get it in other ways ;) )"
 
-   ! eval "$(ask_prompt "install dotnet group? (sdk $(pacman -Qi dotnet-sdk | rg Version)) (y/n)?:	")" && return
+  ! eval "$(ask_prompt "install dotnet group? (sdk $(pacman -Qi dotnet-sdk | rg Version)) (y/n)?:	")" && return
 
-   install_packages dotnet_packages "no"
+  install_packages dotnet_packages "no"
 
   #***rider***
   rider_editsions=(rider rider-eap)
   install_optional_package "rider(dotnet IDE)" rider_editsions "$rider_description"
 
-   #shell auto completion
-   if ! grep 'complete -f -c dotnet -a "(dotnet complete (commandline -cp))"' ~/.config/fish/config.fish &> /dev/null; then
+  #shell auto completion
+  if ! grep 'complete -f -c dotnet -a "(dotnet complete (commandline -cp))"' ~/.config/fish/config.fish &>/dev/null; then
     INFO "configuring fish shell auto completrion."
-    echo 'complete -f -c dotnet -a "(dotnet complete (commandline -cp))"' >> "$HOME/.config/fish/config.fish"
-   fi
+    echo 'complete -f -c dotnet -a "(dotnet complete (commandline -cp))"' >>"$HOME/.config/fish/config.fish"
+  fi
 
-   if ! grep '_dotnet_bash_complete' ~/.bashrc &> /dev/null; then
+  if ! grep '_dotnet_bash_complete' ~/.bashrc &>/dev/null; then
 
     INFO "configuring fish shell auto completrion."
 
-   tee -a ~/.bashrc > /dev/null << EOT
+    tee -a ~/.bashrc >/dev/null <<EOT
 # bash parameter completion for the dotnet CLI
 
 function _dotnet_bash_complete()
@@ -805,58 +870,64 @@ complete -f -F _dotnet_bash_complete dotnet
 EOT
   fi
 
-   if ask_prompt "do you want to instal ILSpy? it's dotnet decompiler (decompiling windows apps on linux is partial) (y/n):	";then
+  if ask_prompt "do you want to instal ILSpy? it's dotnet decompiler (decompiling windows apps on linux is partial) (y/n):	"; then
     yay --noconfirm --needed -S avaloniailspy
-   fi
+  fi
 
-   install_dotnet_tools
+  install_dotnet_tools
 
-   install_linq_pad
+  install_linq_pad
 }
 
-install_invidia_packages(){
-  ! eval "$( ask_prompt "are you an invidia user?(y/n): ")" && return
+install_invidia_packages() {
+  ! eval "$(ask_prompt "are you an invidia user?(y/n): ")" && return
 
   install_packages invidia_packages "yes"
 }
 
 #--------------------------------main-----------------------------------
 
- main(){
+main() {
 
   #use a simple help about script
 
-   opts=$(getopt --options h --longoptions 'help' -n bootstrap -- "$@")
+  opts=$(getopt --options h --longoptions 'help' -n bootstrap -- "$@")
 
-   eval set -- "$opts"
+  eval set -- "$opts"
 
-   #this wont work and need debuging
+  #this wont work and need debuging
 
-   while [ -n "$*" ]; do
+  while [ -n "$*" ]; do
     case "$1" in
-    -h | --help) usage; shift; exit;;
-    --) break;;
-    *)   ERROR "Unrecognized option '$1'"
-            usage;;
+    -h | --help)
+      usage
+      shift
+      exit
+      ;;
+    --) break ;;
+    *)
+      ERROR "Unrecognized option '$1'"
+      usage
+      ;;
     esac
-   done
+  done
 
-  if (( $EUID == 0 )); then
+  if (($EUID == 0)); then
 
     ERROR "do not run this script as root, the program will ask you for sudo privilege if needed."
     exit 1
   fi
 
   #check for internet connection
-    /usr/bin/eos-connection-checker || {
-        ERROR "Internet connection is not available. exiting"
-        exit
-        }
+  /usr/bin/eos-connection-checker || {
+    ERROR "Internet connection is not available. exiting"
+    exit
+  }
 
-   Blue "Hello, World! ;)"
+  Blue "Hello, World! ;)"
 
-echo -e "$blue"
-  cat  <<EOF
+  echo -e "$blue"
+  cat <<EOF
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⢰⣦⡀⠀⠀⠀⠀⠀⣰⣿⣿⣿⣷⣄⠀⠀⠀⠀⠀⢀⣴⣦⠀⠀⠀⠀
 ⠀⠀⠀⠀⣿⣿⣿⣦⡀⠀⠀⣼⣿⣿⣿⣿⣿⣿⣆⠀⠀⢀⣴⣿⣿⣿⠀⠀⠀⠀,ggggggggggg,                               ,gggg,
@@ -873,67 +944,65 @@ echo -e "$blue"
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⠛⠛⠛⠛⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ---------------------------------------------------------------------------------------------------------------------------
 EOF
-echo -e "$reset"
+  echo -e "$reset"
 
-   INFO "updating system first"
-   yay --noconfirm -Syu
+  INFO "updating system first"
+  yay --noconfirm -Syu
 
+  Yellow "--------------------------------------------Change Mirrors--------------------------------------------"
+  change_mirrors
+  echo2
 
-   Yellow "--------------------------------------------Change Mirrors--------------------------------------------"
-   change_mirrors
-   echo2
+  Yellow "---------------------------------------------Chacnge DNS----------------------------------------------"
+  change_dns
+  echo2
 
-   Yellow "---------------------------------------------Chacnge DNS----------------------------------------------"
-   change_dns
-   echo2
+  Yellow "-------------------------------------------Installing fonts-------------------------------------------"
+  install_fonts
+  echo2
 
-   Yellow "-------------------------------------------Installing fonts-------------------------------------------"
-   install_fonts
-   echo2
+  Yellow "--------------------------------------------Emptying cache--------------------------------------------"
+  yay_clean_up 10
+  echo2
 
-   Yellow "--------------------------------------------Emptying cache--------------------------------------------"
-   yay_clean_up 10
-   echo2
+  Yellow "---------------------------------------Installing Basic packages--------------------------------------"
+  install_packages pkgs "yes"
+  echo2
 
-   Yellow "---------------------------------------Installing Basic packages--------------------------------------"
-   install_packages pkgs "yes"
-   echo2
+  Yellow "------------------------------------------Nvidia packages---------------------------------------------"
+  install_packages invidia_packages
+  echo2
 
-   Yellow "------------------------------------------Nvidia packages---------------------------------------------"
-   install_packages invidia_packages
-   echo2
+  Yellow "-----------------------------------------configuring system-------------------------------------------"
+  configure_system
+  echo2
 
-   Yellow "-----------------------------------------configuring system-------------------------------------------"
-   configure_system
-   echo2
+  Yellow "----------------------------------------Installing Plugins--------------------------------------------"
+  install_fish_plugins
+  echo2
 
-   Yellow "----------------------------------------Installing Plugins--------------------------------------------"
-   install_fish_plugins
-   echo2
+  Yellow "-----------------------------------------Installing Dotnet--------------------------------------------"
+  install_dotnet
+  echo2
 
-   Yellow "-----------------------------------------Installing Dotnet--------------------------------------------"
-   install_dotnet
-   echo2
+  Yellow "------------------------------------Installing optional packages--------------------------------------"
+  optional_packages
+  echo2
 
-   Yellow "------------------------------------Installing optional packages--------------------------------------"
-   optional_packages
-   echo2
+  Yellow "-----------------------------------Installing scientific packages-------------------------------------"
+  install_scintific
+  echo2
 
-   Yellow "-----------------------------------Installing scientific packages-------------------------------------"
-   install_scintific
-   echo2
+  Yellow "--------------------------------------------Removing cache--------------------------------------------"
+  yay_clean_up 50
+  echo2
 
-   Yellow "--------------------------------------------Removing cache--------------------------------------------"
-   yay_clean_up 50
-   echo2
+  Yellow "-------------------------------------Installing zen kernel--------------------------------------------"
+  install_zen_kernel
+  echo2
 
-   Yellow "-------------------------------------Installing zen kernel--------------------------------------------"
-   install_zen_kernel
-   echo2
-
-
-   Yellow "-----------------------------------------------finished-----------------------------------------------"
-   INFO "\n\ninstallation finished.
+  Yellow "-----------------------------------------------finished-----------------------------------------------"
+  INFO "\n\ninstallation finished.
    things to do now:
     1) reboot pc
     2) configure vpn (nekoray or clash)
@@ -953,6 +1022,6 @@ echo -e "$reset"
     reboot
   fi
 
- }
+}
 
 main "$@"

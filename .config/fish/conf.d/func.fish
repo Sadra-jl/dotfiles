@@ -1,4 +1,4 @@
-function mkdir -d "Create a directory and set CWD"
+function mkdirm -d "Create a directory and set CWD"
     command mkdir $argv
 
     if test $status = 0

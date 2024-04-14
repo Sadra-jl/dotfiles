@@ -4,24 +4,24 @@
 #⠀⠀⠀⠀⢰⣦⡀⠀⠀⠀⠀⠀⣰⣿⣿⣿⣷⣄⠀⠀⠀⠀⠀⢀⣴⣦⠀⠀⠀⠀
 #⠀⠀⠀⠀⣿⣿⣿⣦⡀⠀⠀⣼⣿⣿⣿⣿⣿⣿⣆⠀⠀⢀⣴⣿⣿⣿⠀⠀⠀⠀,ggggggggggg,                               ,gggg,
 #⠀⠀⠀⠀⣿⣿⣿⣿⣷⡄⠘⣿⣿⣿⣿⣿⣿⣿⡿⠀⣴⣿⣿⣿⣿⣿⠀⠀⠀⠀dP"""88""""""Y8,      ,dPYb,                d8" "8I               I8
-#⠀⢸⣦⡀⠙⢿⣿⣿⣿⣿⠆⠈⠛⣋⣉⣉⡛⠛⠀⢾⣿⣿⣿⣿⡿⠟⢀⣤⡆⠀Yb,  88      `8b      IP'`Yb                88  ,dP               I8
-#⠀⢸⣿⣿⣷⣄⠙⢿⠟⢁⣴⣾⣿⠿⠛⠻⣿⣿⣦⣄⠙⢿⡿⠋⣀⣴⣿⣿⡇⠀ `"  88      ,8P      I8  8I             8888888P"             88888888
-#⠀⢸⣿⣿⣿⣿⣷⣄⠐⢿⣿⠟⢁⣴⣾⣦⡀⠙⢿⣿⡷⠀⣠⣾⣿⣿⣿⣿⡇⠀     88aaaad8P"       I8  8'                88                    I8
+#⠀⢸⣦⡀⠙⢿⣿⣿⣿⣿⠆⠈⠛⣋⣉⣉⡛⠛⠀⢾⣿⣿⣿⣿⡿⠟⢀⣤⡆⠀Yb,  88      \`8b      IP'\`Yb                88  ,dP               I8
+#⠀⢸⣿⣿⣷⣄⠙⢿⠟⢁⣴⣾⣿⠿⠛⠻⣿⣿⣦⣄⠙⢿⡿⠋⣀⣴⣿⣿⡇⠀ \`"  88      ,8P      I8  8I             8888888P\"             88888888
+#⠀⢸⣿⣿⣿⣿⣷⣄⠐⢿⣿⠟⢁⣴⣾⣦⡀⠙⢿⣿⡷⠀⣠⣾⣿⣿⣿⣿⡇⠀     88aaaad8P\"       I8  8\'                88                    I8
 #⠀⢸⣿⣿⣿⣿⣿⣿⣦⡀⠁⣴⣿⣿⣿⣿⣿⣦⡈⠋⣠⣾⣿⣿⣿⣿⣿⣿⠃⠀     88""""",gggg,gg  I8 dP   ,ggg,         88          ,ggggg,   I8   gg      gg    ,g,
 #⠀⠈⣿⣿⣿⣿⣿⣿⡟⢀⣾⣿⣿⣿⣿⣿⣿⣿⣷⡀⢻⣿⣿⣿⣿⣿⣿⡏⠀⠀     88    dP"  "Y8I  I8dP   i8" "8i   ,aa,_88         dP"  "Y8gggI8   I8      8I   ,8'8,
 #⠀⠀⠸⣿⣿⣿⣿⣿⠁⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⠈⣿⣿⣿⣿⣿⡟⠀⠀⠀     88   i8'    ,8I  I8P    I8, ,8I  dP" "88P        i8'    ,8I ,I8,  I8,    ,8I  ,8'  Yb
-#⠀⠀⠀⠹⣿⣿⣿⣿⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⣿⣿⣿⣿⡟⠁⠀⠀⠀     88  ,d8,   ,d8b,,d8b,_  `YbadP'  Yb,_,d88b,,_   ,d8,   ,d8',d88b,,d8b,  ,d8b,,8'_   8)
-#⠀⠀⠀⠀⠈⠻⣿⣿⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⢀⣿⣿⡿⠋⠀⠀⠀⠀⠀     88  P"Y8888P"`Y88P'"Y88888P"Y888  "Y8P"  "Y88888P"Y8888P"  8P""Y88P'"Y88P"`Y8P' "YY8P8P
+#⠀⠀⠀⠹⣿⣿⣿⣿⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⣿⣿⣿⣿⡟⠁⠀⠀⠀     88  ,d8,   ,d8b,,d8b,_  \`YbadP'  Yb,_,d88b,,_   ,d8,   ,d8',d88b,,d8b,  ,d8b,,8'_   8)
+#⠀⠀⠀⠀⠈⠻⣿⣿⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⢀⣿⣿⡿⠋⠀⠀⠀⠀⠀     88  P"Y8888P"\`Y88P'"Y88888P"Y888  "Y8P"  "Y88888P"Y8888P"  8P""Y88P'"Y88P"\`Y8P' "YY8P8P
 #⠀⠀⠀⠀⠀⠀⠈⠛⠧⠘⣿⣿⣿⣿⣿⣿⣿⣿⡿⠁⠼⠋⠁⠀⠀⠀⠀⠀⠀⠀
 #⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⠛⠛⠛⠛⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-
+#
 #hello, world
 #
 # The execution of this script stops if a command or pipeline has an error.
 # For example, failure to install a dependent package will cause the script
 # to stop execution.
 
-set -e
+#set -e
 
 #--------------------------------variables-----------------------------------
 
@@ -43,7 +43,7 @@ reset="\033[0m"
 
 #list of packages to install
 
-pkgs=(linux-headers bottom zathura zathura-djvu zathura-pdf-mupdf bluez bluez-utils musicbee wl-clipboard typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf betterdiscordctl-git skypeforlinux-bin timeshift calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch)
+pkgs=(linux-headers bottom zathura zathura-djvu zathura-pdf-mupdf bluez bluez-utils musicbee wl-clipboard typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf discord skypeforlinux-bin timeshift calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch)
 
 #todo add dnSpyEx (hard to get it working on linux)
 dotnet_packages=(dotnet-host-bin dotnet-runtime-bin dotnet-sdk-bin dotnet-targeting-pack-bin)
@@ -166,7 +166,7 @@ install_optional_package() {
   local -n package_options=$2
   local description=$3
 
-  ! eval "$(ask_prompt "install $package_name? y/n:  ")" && return
+  ask_prompt "install $package_name? y/n:  " || return
 
   WARN "apps to install options are:	"
 
@@ -190,7 +190,7 @@ install_optional_package() {
 }
 
 change_dns() {
-  ! eval "$(ask_prompt "use Beshkan DNS servers to bypass restriction?$reset ($yellow this will disable NetworkManager auto DNS assignment$reset) y/n:	")" && return
+  ask_prompt "use Beshkan DNS servers to bypass restriction?$reset ($yellow this will disable NetworkManager auto DNS assignment$reset) y/n:	" || return
 
   backup /etc/NetworkManager/NetworkManager.conf
   echo -e "[Main]\ndns=none\n#plugins=ifcfg-rh,ibft" | sudo tee -a /etc/NetworkManager/NetworkManager.conf
@@ -262,6 +262,12 @@ configure_zoxide() {
   fi
 }
 
+is_package_installed(){
+    package="$1"
+    check="$(sudo yay -Qs --color always "${package}" | grep "local" | grep "${package} ")"
+    return "$(test -n "${check}")"
+}
+
 install_packages() {
 
   local -n packages_to_install=$1
@@ -280,7 +286,7 @@ install_packages() {
     echo -e "\t$pkg"
   done
 
-  if ! eval "$(ask_prompt "press y to continue:  ")"; then
+  if ! (ask_prompt "press y to continue:  "); then
     if [ "$terminate_app_str" = "yes" ]; then
       WARN "this packages are important to for furthur installation and are 50% of what this script is about
 if you accidently passed no its time control+c now and start over."
@@ -292,7 +298,21 @@ if you accidently passed no its time control+c now and start over."
   fi
 
   INFO "installing packages"
-  yay -S --needed "$pacman_confirm" "${packages_to_install[@]}"
+
+    for pkg in "${packages_to_install[@]}"; do
+        if is_package_installed "${pkg}"; then
+            echo "${pkg} is already installed."
+            continue
+        fi
+
+        to_install+=("${pkg}")
+    done
+
+    #"All pacman packages are already installed."
+    test -z "${to_install[@]}" && return
+
+    printf "Package not installed:\n%s\n" "${to_install[@]}"
+    yay -S --needed "$pacman_confirm" "${to_install[@]}"
 }
 
 optional_packages() {
@@ -700,7 +720,7 @@ configure_system() {
 
 install_scintific() {
 
-  ! eval "$(ask_prompt "install scientific apps? $yellow you may not need them.$reset (y/n):  ") " && return
+  ask_prompt "install scientific apps? $yellow you may not need them.$reset (y/n):  "  || return
 
   install_packages scientific_packages "no"
 
@@ -718,58 +738,54 @@ install_scintific() {
 
 change_mirrors() {
 
-  ! eval "$(ask_prompt "change mirrors? (rate-mirrors program will be installed) y/n:	")" && return
+    ask_prompt "change mirrors? (rate-mirrors program will be installed) y/n:	" || return
 
-  INFO "installing rate-mirrors"
+    INFO "installing rate-mirrors"
 
-  ##it will get when its allreaddy installed and why break pipe here we can break it when calling it
-  ##lets not delete this block to remind us we have problems to solve.
+    ##it will get when its allreaddy installed and why break pipe here we can break it when calling it
+    ##lets not delete this block to remind us we have problems to solve.
 
-  #if ! $( yay -S --needed --noconfirm rate-mirrors) ; then
-  #ERROR "installation of \"rate-mirrors\" failed. try solve the problem manually and try again."
-  #exit
-  #fi
+    #if ! $( yay -S --needed --noconfirm rate-mirrors) ; then
+    #ERROR "installation of \"rate-mirrors\" failed. try solve the problem manually and try again."
+    #exit
+    #fi
 
-  yay -S --needed --noconfirm rate-mirrors
+    yay -S --needed --noconfirm rate-mirrors
 
-  #updating arch mirrorlist
+    #updating arch mirrorlist
 
-  if ask_prompt "do want to backup mirrorlist?(recommended) y/n:	"; then
+    if ask_prompt "do want to backup mirrorlist?(recommended) y/n:	"; then
     backup /etc/pacman.d/mirrorlist
-  fi
+    fi
 
-  local http="--protocol http"
-  local https="--protocol https"
-  local protocol="$http $https"
+    local http="--protocol http"
+    local https="--protocol https"
+    local protocol="$http $https"
 
-  if ! eval "$(ask_prompt "do you want to include http? y/n:	")"; then
+    if ! eval "$(ask_prompt "do you want to include http? y/n:	")"; then
     protocol=$https
-  fi
+    fi
 
-  INFO "updating arch mirrorlist"
-  rate-mirrors --allow-root "$protocol" arch | sudo tee /etc/pacman.d/mirrorlist
+    INFO "updating arch mirrorlist"
+    rate-mirrors --allow-root "$protocol" arch | sudo tee /etc/pacman.d/mirrorlist
 
-  #updating	endeavourOs mirrorlist
-  ! eval "$(ask_prompt "do you want to update EndeavourOs mirrorlist as well?") " && return
+    #updating	endeavourOs mirrorlist
+    ask_prompt "do you want to update EndeavourOs mirrorlist as well?" || return
 
-  eval "$(ask_prompt "do want to backup endeavouros-mirrorlist?(recommended) y/n:	") " && backup /etc/pacman.d/endeavouros-mirrorlist
+    ask_prompt "do want to backup endeavouros-mirrorlist?(recommended) y/n:	" && backup /etc/pacman.d/endeavouros-mirrorlist
 
-  if ask_prompt "do you want to include http? y/n:	"; then
-    protocol="$http $https"
-  else
-    protocol=$https
-  fi
+    ask_prompt "do you want to include http? y/n:	" && protocol="$http $https" || protocol=$https
 
-  INFO "updating endeavourOs mirrorlist"
+    INFO "updating endeavourOs mirrorlist"
 
-  rate-mirrors --allow-root "$protocol" endeavouros | sudo tee /etc/pacman.d/endeavouros-mirrorlist
+    rate-mirrors --allow-root "$protocol" endeavouros | sudo tee /etc/pacman.d/endeavouros-mirrorlist
 }
 
 yay_clean_up() {
 
   local number_of_lines=$1
 
-  ! eval "$(ask_prompt "do you want to clear package installation cache? (y/n):	")" && return
+    ask_prompt "do you want to clear package installation cache? (y/n):	" || return
 
   Blue "usally it's good to have 3 last installed package cache for rollback system,
 but in my openion it's ok to remove them as they are fresh install and I hope furthur
@@ -792,29 +808,28 @@ updates wont force to rollback also having btrs timeshift will reduce the stress
   Yellow "--------------------------------------------"
   echo2
 
-  ! eval "$(ask_prompt "prossed with operation?(y/n):	")" && return
+    ask_prompt "prossed with operation?(y/n):	" || return
 
   yay -Scc
 }
 
 install_zen_kernel() {
 
-  WARN "zen kernel(or any over kernels over than vanila linux) may have some problems like for example pc may not shutdown properly sometimes. use at your own risk"
-  ! eval "$(ask_prompt "do you want to install and change kernel to zen-kernel? (y/n):	")" && return
+    WARN "zen kernel(or any over kernels over than vanila linux) may have some problems like for example pc may not shutdown properly sometimes. use at your own risk"
+    ask_prompt "do you want to install and change kernel to zen-kernel? (y/n):	" || return
 
-  INFO "current kernel: $(uname -r)"
+    INFO "current kernel: $(uname -r)"
 
-  sudo pacman --needed --noconfirm -S linux-zen linux-zen-headers
+    sudo pacman --needed --noconfirm -S linux-zen linux-zen-headers
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
 
-  sudo grub-mkconfig -o /boot/grub/grub.cfg
-
-  INFO "install complited, check kernel after reboot with 'uname -r' command"
+    INFO "install complited, check kernel after reboot with 'uname -r' command"
 }
 
 install_fonts() {
   local font_packages=(ttf-fira-code ttc-iosevka ttf-ms-win11-auto ttf-ms-win10-auto ttf-jetbrains-mono-nerd cantarell-fonts ttf-noto-nerd ttf-nerd-fonts-symbols-mono ttf-font-awesome awesome-terminal-fonts ttf-bitstream-vera ttf-dejavu ttf-liberation noto-fonts-extra ttf-opensans adobe-source-sans-pro-fonts terminus-font ttf-droid ttf-hack ttf-ms-fonts steam-fonts)
 
-  ! eval "$(ask_prompt "install fonts? (y/n):	")" && return
+    ask_prompt "install fonts? (y/n):	" || return
 
   install_packages font_packages "no"
 }
@@ -831,7 +846,7 @@ dotnet_installer() {
 }
 
 install_dotnet_tools() {
-  ! eval "$(ask_prompt "install dotnet cli tools? (y/n):  ") " && return
+    ask_prompt "install dotnet cli tools? (y/n):  " || return
 
   sudo dotnet workload update
 
@@ -843,7 +858,7 @@ install_dotnet_tools() {
 }
 
 install_linq_pad() {
-  ! eval "$(ask_prompt "install linq pad? (dotnet play ground good for sql; wine must been installed) (y/n):	")" && return
+    ask_prompt "install linq pad? (dotnet play ground good for sql; wine must been installed) (y/n):	" || return
 
   local current_dir
   current_dir=$(pwd)
@@ -897,7 +912,7 @@ using rider eap does not need any licencing as eap stands for early access progr
 its license trial is 30 days and you have to update to next eap.
 by installing rider you need to have license (or get it in other ways ;) )"
 
-  ! eval "$(ask_prompt "install dotnet group? (sdk $(pacman -Qi dotnet-sdk | rg Version)) (y/n)?:	")" && return
+    ask_prompt "install dotnet group? (sdk $(pacman -Qi dotnet-sdk | rg Version)) (y/n)?:	" || return
 
   install_packages dotnet_packages "no"
 
@@ -983,6 +998,7 @@ main() {
 
   echo -e "$blue"
   cat <<EOF
+---------------------------------------------------------------------------------------------------------------------------
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⢰⣦⡀⠀⠀⠀⠀⠀⣰⣿⣿⣿⣷⣄⠀⠀⠀⠀⠀⢀⣴⣦⠀⠀⠀⠀
 ⠀⠀⠀⠀⣿⣿⣿⣦⡀⠀⠀⣼⣿⣿⣿⣿⣿⣿⣆⠀⠀⢀⣴⣿⣿⣿⠀⠀⠀⠀,ggggggggggg,                               ,gggg,

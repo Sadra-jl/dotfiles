@@ -32,6 +32,7 @@ red="\033[38:5:1m"
 yellow="\033[1;93m "
 blue="\033[38:5:45m"
 white="\033[38:5:255m"
+orange='\033[0;33m'
 
 #background
 red_b="\033[48:5:1m"
@@ -42,7 +43,7 @@ reset="\033[0m"
 
 #list of packages to install
 
-pkgs=(zathura zathura-djvu zathura-pdf-mupdf bluez bluez-utils musicbee wl-clipboard typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf betterdiscordctl-git skypeforlinux-bin timeshift calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-btrfs grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch)
+pkgs=(linux-headers bottom zathura zathura-djvu zathura-pdf-mupdf bluez bluez-utils musicbee wl-clipboard typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf betterdiscordctl-git skypeforlinux-bin timeshift calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch)
 
 #todo add dnSpyEx (hard to get it working on linux)
 dotnet_packages=(dotnet-host-bin dotnet-runtime-bin dotnet-sdk-bin dotnet-targeting-pack-bin)
@@ -51,7 +52,6 @@ dotnet_packages=(dotnet-host-bin dotnet-runtime-bin dotnet-sdk-bin dotnet-target
 scientific_packages=(maxima geogebra kalzium kbibtex kstars labplot mathematica python-pandas python-matplotlib python-tensorflow cython)
 
 steam_packages=(steam lutris steam-native-runtime dxvk-bin vkd3d-proton winetricks pipewire-pulse)
-
 
 #--------------------------------functions-----------------------------------
 
@@ -69,6 +69,7 @@ echo2() { echo -e "$@" >&2; }
 Red() { echo2 "$red""$@""$reset"; }
 Yellow() { echo2 "$yellow""$@""$reset"; }
 Blue() { echo2 "$blue""$@""$reset"; }
+Orange() { echo2 "$orange""$@""$reset"; }
 
 WARN() {
   local msg="$1"
@@ -102,8 +103,8 @@ usage() {
 Usage: bootstrap
 
 Options:
-  --help,	-h
-      this help.
+--help,	-h
+this help.
 
 this script will configure and install basic apps (and settings) for fresh
 EndeavourOs system. around 120 programs will be installed and configured;
@@ -302,7 +303,7 @@ optional_packages() {
 using pycharm eap does not need any licencing as eap stands for early access program
 its license trial is 30 days and you have to update to next eap.
 
-  by installing pycharm professinal you need to have license (or get it in other ways ;) )"
+by installing pycharm professinal you need to have license (or get it in other ways ;) )"
 
   local edge_description="stable verstion as it says is stable one, dev edition is bleeding edge..."
 
@@ -450,7 +451,7 @@ configure_bare_git() {
 # ------------------------------------------------------
 configure_btrfs() {
 
-  local btrfs_packages=("snapper" "snap-pac" "snapper-rollback" "btrfs-assistant" "btrfsmaintenance")
+  local btrfs_packages=("snapper" "snap-pac" "snapper-rollback" "btrfs-assistant" "btrfsmaintenance" "grub-btrfs")
   filesystem_type=$(findmnt -n -o FSTYPE /)
 
   if [ "$filesystem_type" != "btrfs" ]; then
@@ -479,138 +480,117 @@ configure_btrfs() {
   done
 }
 
-configure_cpu(){
-    # Trim whitespaces from the CPU vendor
-    cpu_info=$(lscpu)
+configure_cpu() {
+  # Trim whitespaces from the CPU vendor
+  cpu_info=$(lscpu)
 
-    # Debug print to check CPU info
-    #echo "CPU Info: $cpu_info"
+  # Debug print to check CPU info
+  #echo "CPU Info: $cpu_info"
 
-    # ---------------------------------------------------------------------
-    # Check CPU vendor and execute AMD-specific code if AMD CPU is detected
-    # ---------------------------------------------------------------------
+  # ---------------------------------------------------------------------
+  # Check CPU vendor and execute AMD-specific code if AMD CPU is detected
+  # ---------------------------------------------------------------------
 
-    cpu_vendor=$(lscpu | grep "Vendor ID" | awk '{print $3}')
+  cpu_vendor=$(lscpu | grep "Vendor ID" | awk '{print $3}')
 
-    if [ "$cpu_vendor" == "AuthenticAMD" ]; then
-        INFO  "AMD CPU detected.$reset Running AMD-specific code..."
+  if [ "$cpu_vendor" == "AuthenticAMD" ]; then
+    INFO "AMD CPU detected.$reset Running AMD-specific code..."
 
-        # Check if amd-ucode is installed
-        if echo "$cpu_info" | grep -qi "AuthenticAMD"; then
-            INFO "amd-ucode is installed."
-            # Add your AMD-specific code here
-        else
-            WARN "amd-ucode is not installed. Please install it for optimal performance."
-            # Add code to install amd-ucode if desired
-        fi
-    fi
-
-    # -------------------------------------------------------------------
-    # Check CPU vendor and execute INTEL-specific code if CPU is detected
-    # -------------------------------------------------------------------
-
-    if [ "$cpu_vendor" == "GenuineIntel" ]; then
-        INFO "INTEL CPU detected.${reset} Running INTEL-specific code..."
-
-        # Check if intel-ucode is installed
-        if pacman -Qi intel-ucode &> /dev/null; then
-            INFO "intel-ucode is installed."
-            # Add your INTEL-specific code here
-        else
-            WARN "intel-ucode is not installed. Please install it for optimal performance."
-            # Add code to install intel-ucode if desired
-        fi
-    fi
-}
-
-configure_grub(){
-    INFO "Please be patient; we are doing a last check to see if GRUB is correctly configured for your hyprland installation with an NVIDIA GPU."
-    INFO "For safety reasons, we are now making a backup of the GRUB configuration. See /etc/default/grub.bak"
-
-    backup /etc/default/grub
-
-    # Check if the nvidia-drm.modeset=1 option is present in GRUB_CMDLINE_LINUX
-    if  grep -q "nvidia-drm.modeset=1" /etc/default/grub; then
-        INFO "GRUB_CMDLINE_LINUX already contains nvidia-drm.modeset=1. No changes needed."
-        return
-    fi
-    # Append the option if it's not present
-    sudo sed -i 's/GRUB_CMDLINE_LINUX="\(.*\)"/GRUB_CMDLINE_LINUX="\1 nvidia-drm.modeset=1"/' /etc/default/grub
-
-    # Regenerate GRUB configuration
-    sudo grub-mkconfig -o /boot/grub/grub.cfg
-
-    INFO "Added nvidia-drm.modeset=1 to GRUB_CMDLINE_LINUX."
-
-    # Update GRUB only if changes are made
-    sudo update-grub
-}
-
-configure_nvidia()
-{
-    # ------------------------------------------------------
-    # Check if Nvidia GPU is present
-    # ------------------------------------------------------
-    if ! eval "$(lspci | grep -i "NVIDIA" > /dev/null)"; then
-        INFO "No Nvidia GPU detected. Skipping installation of Nvidia-specific packages."
-        return
-    fi
-        INFO "Nvidia GPU detected. Installing Nvidia packages..."
-
-    # Install Nvidia-specific packages
-    nvidia_packages=("libva" "libva-nvidia-driver-git" "nvidia-dkms" "nvidia-utils" "lib32-nvidia-utils" "nvidia-settings")
-
-    for package in "${nvidia_packages[@]}"; do
-        if pacman -Qi "$package" &> /dev/null; then
-            INFO "$package is already installed. Skipping."
-        else
-            # Install the package
-            if yay -S --noconfirm "$package"; then
-                INFO "$package installed."
-            else
-                ERROR "Failed to install $package. Manual intervention may be required."
-                exit 1
-            fi
-        fi
-    done
-
-    configure_grub
-}
-
-
-configure_system() {
-
-  configure_btrfs
-  configure_cpu
-  configure_nvidia
-
-  #chnge shell for user
-  #i dont like this if statement
-  if ask_prompt "change shell to fish? y/n:  "; then
-    if sudo chsh "--shell $(which fish) $(whoami)"; then
-      Warn "shell changed. restart terminal or source profile."
+    # Check if amd-ucode is installed
+    if echo "$cpu_info" | grep -qi "AuthenticAMD"; then
+      INFO "amd-ucode is installed."
+    # Add your AMD-specific code here
     else
-      ERROR "changeing shell to fish failed for the user \"$(whoami)\"
-change it yourself after installation"
+      WARN "amd-ucode is not installed. Please install it for optimal performance."
+    # Add code to install amd-ucode if desired
     fi
-  else
-    echo "user shell remained unchanged"
   fi
 
-  #change shell for root
-  #i dont like this code duplication
-  if ask_prompt "change shell to fish?($red_b root$reset) y/n:  "; then
-    if sudo chsh --shell "$(which fish)" root; then
-      WARN "shell changed. restart terminal or source profile."
+  # -------------------------------------------------------------------
+  # Check CPU vendor and execute INTEL-specific code if CPU is detected
+  # -------------------------------------------------------------------
+
+  if [ "$cpu_vendor" == "GenuineIntel" ]; then
+    INFO "INTEL CPU detected.${reset} Running INTEL-specific code..."
+
+    # Check if intel-ucode is installed
+    if pacman -Qi intel-ucode &>/dev/null; then
+      INFO "intel-ucode is installed."
+    # Add your INTEL-specific code here
     else
-      ERROR "changeing shell to fish failed for the root user \"$(whoami)\"
-change it yourself after installation"
+      WARN "intel-ucode is not installed. Please install it for optimal performance."
+    # Add code to install intel-ucode if desired
     fi
-  else
-    echo "root user shell remained unchanged"
+  fi
+}
+
+configure_grub() {
+  INFO "Please be patient; we are doing a last check to see if GRUB is correctly configured for your hyprland installation with an NVIDIA GPU."
+  INFO "For safety reasons, we are now making a backup of the GRUB configuration. See /etc/default/grub.bak"
+
+  backup /etc/default/grub
+
+  # Check if the nvidia-drm.modeset=1 option is present in GRUB_CMDLINE_LINUX
+  if grep -q "nvidia-drm.modeset=1" /etc/default/grub; then
+    INFO "GRUB_CMDLINE_LINUX already contains nvidia-drm.modeset=1. No changes needed."
+    return
+  fi
+  # Append the option if it's not present
+  sudo sed -i 's/GRUB_CMDLINE_LINUX="\(.*\)"/GRUB_CMDLINE_LINUX="\1 nvidia-drm.modeset=1"/' /etc/default/grub
+
+  # Regenerate GRUB configuration
+  sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+  INFO "Added nvidia-drm.modeset=1 to GRUB_CMDLINE_LINUX."
+
+  # Update GRUB only if changes are made
+  sudo update-grub
+}
+
+configure_nvidia() {
+  # ------------------------------------------------------
+  # Check if Nvidia GPU is present
+  # ------------------------------------------------------
+  if ! eval "$(lspci | grep -i "NVIDIA" >/dev/null)"; then
+    INFO "No Nvidia GPU detected. Skipping installation of Nvidia-specific packages."
+    return
+  fi
+  INFO "Nvidia GPU detected. Installing Nvidia packages..."
+
+  # Install Nvidia-specific packages
+  nvidia_packages=("libva" "libva-nvidia-driver-git" "nvidia-dkms" "nvidia-utils" "lib32-nvidia-utils" "nvidia-settings")
+
+  for package in "${nvidia_packages[@]}"; do
+    if pacman -Qi "$package" &>/dev/null; then
+      INFO "$package is already installed. Skipping."
+    else
+      # Install the package
+      if yay -S --noconfirm "$package"; then
+        INFO "$package installed."
+      else
+        ERROR "Failed to install $package. Manual intervention may be required."
+        exit 1
+      fi
+    fi
+  done
+
+  configure_grub
+}
+
+change_shell() {
+  local user=$1
+  ask_prompt "change shell to fish user: ${orange}${user}? y/n:  " || (echo "user shell remained unchanged" && return)
+
+  if sudo chsh "--shell $(which fish) ${user}"; then
+    Warn "shell changed. restart terminal or source profile."
+    return
   fi
 
-  #add persian keyboard
+  ERROR "changeing shell to fish failed for the user \"$(whoami)\"
+change it yourself after installation"
+}
+
+add_windows_persian_keybord_layout() {
   if ask_prompt "add windows keybord layout for persian?$yellow kde now have persian windows layout (y/n):  "; then
     git clone https://github.com/sinadarvi/windows-persian-keyboard-for-linux.git
     cd windows-persian-keyboard-for-linux
@@ -620,20 +600,21 @@ change it yourself after installation"
     sudo rm -r windows-persian-keyboard-for-linux
     INFO "moving on..."
   fi
+}
 
-  #set eza aliases
-  if ask_prompt "set aliases for ls to eza? (fish sell only) (y/n):  "; then
+set_fish_aliases() {
+  ask_prompt "set aliases for ls to eza? (fish sell only) (y/n):  " || return
 
-    local alias_path=~/.config/fish/conf.d/alias.fish
+  local alias_path=~/.config/fish/conf.d/alias.fish
 
-    if [ -f "$alias_path" ] && [ $(ask_prompt "do you want to backup $alias_path?") ]; then
-      backup "$alias_path"
-    fi
+  if [ -f "$alias_path" ] && [ "$(ask_prompt "do you want to backup $alias_path?")" ]; then
+    backup "$alias_path"
+  fi
 
-    touch $alias_path
+  touch "$alias_path"
 
-    if ! grep "alias ls='eza --color=always --sort=size'" ~/.config/fish/conf.d/alias.fish &>/dev/null; then
-      tee -a $alias_path >/dev/null <<EOT
+  if ! grep "alias ls='eza --color=always --sort=size'" ~/.config/fish/conf.d/alias.fish &>/dev/null; then
+    tee -a $alias_path >/dev/null <<EOT
 alias ls='eza --color=always --sort=size'
 
 #list only directories
@@ -652,30 +633,15 @@ alias ll='eza -al'
 alias lt='eza -al --sort=modified'
 
 EOT
-    fi
   fi
+}
 
-  INFO "installing fisher..."
+install_starship() {
+  ! eval "$(pacman -Qi starship &>/dev/null)" || return
 
-  fish --command "curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher"
-  echo "done"
-
-  configure_zoxide
-
-  sudo rm -rf /usr/share/sddm/themes/{elarun, maldives, maya} || { ERROR "Removal of unwanted folders failed (sddm)."; }
-
-  #configuring procs
-
-  cd "$HOME/.config/fish/conf.d/"
-
-  if ! [ -f ./procs.fish ]; then
-    procs --gen-completion fish
-  fi
-  cd "$OLDPWD"
-
-  #add starship
   INFO "installing startship"
-  curl -sS https://starship.rs/install.sh | sh
+  sudo pacman --needed --noconfirm -S starship
+
   if ! grep 'starship init fish | source' ~/.config/fish/config.fish &>/dev/null; then
     echo 'starship init fish | source' >>~/.config/fish/config.fish
   fi
@@ -684,8 +650,50 @@ EOT
     echo -e "eval \"$(starship init bash)\"" >>~/.bashrc
   fi
 
+}
+
+configure_system() {
+
+  configure_btrfs
+  configure_cpu
+  configure_nvidia
+
+  #chnge shell for user
+  change_shell "$(whoami)"
+
+  #change shell for root
+  change_shell "root"
+
+  #add persian keyboard
+  add_windows_persian_keybord_layout
+
+  #set eza alias
+  set_fish_aliases
+
+  if ! eval "$(fish -c "fisher" &>/dev/null)"; then
+    INFO "installing fisher..."
+
+    fish --command "curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher"
+    echo "done"
+  fi
+
+  configure_zoxide
+
+  sudo rm -rf /usr/share/sddm/themes/{elarun, maldives, maya} || { ERROR "Removal of unwanted folders failed (sddm)."; }
+
+  #configuring procs
+  cd "$HOME/.config/fish/conf.d/"
+
+  if ! [ -f ./procs.fish ]; then
+    procs --gen-completion fish
+  fi
+  cd "$OLDPWD"
+
+  install_starship
+
   configure_bare_git
 
+  #enable bluetooth support
   sudo systemctl enable bluetooth.service
   sudo systemctl enable --now bluetooth
 }
@@ -764,8 +772,8 @@ yay_clean_up() {
   ! eval "$(ask_prompt "do you want to clear package installation cache? (y/n):	")" && return
 
   Blue "usally it's good to have 3 last installed package cache for rollback system,
-  but in my openion it's ok to remove them as they are fresh install and I hope furthur
-  updates wont force to rollback also having btrs timeshift will reduce the stress."
+but in my openion it's ok to remove them as they are fresh install and I hope furthur
+updates wont force to rollback also having btrs timeshift will reduce the stress."
 
   WARN "showing max of 50 lines."
 
@@ -912,12 +920,12 @@ by installing rider you need to have license (or get it in other ways ;) )"
 
 function _dotnet_bash_complete()
 {
-  local cur="${COMP_WORDS[COMP_CWORD]}" IFS=$'\n' # On Windows you may need to use use IFS=$'\r\n'
-  local candidates
+local cur="${COMP_WORDS[COMP_CWORD]}" IFS=$'\n' # On Windows you may need to use use IFS=$'\r\n'
+local candidates
 
-  read -d '' -ra candidates < <(dotnet complete --position "${COMP_POINT}" "${COMP_LINE}" 2>/dev/null)
+read -d '' -ra candidates < <(dotnet complete --position "${COMP_POINT}" "${COMP_LINE}" 2>/dev/null)
 
-  read -d '' -ra COMPREPLY < <(compgen -W "${candidates[*]:-}" -- "$cur")
+read -d '' -ra COMPREPLY < <(compgen -W "${candidates[*]:-}" -- "$cur")
 }
 
 complete -f -F _dotnet_bash_complete dotnet
@@ -932,7 +940,6 @@ EOT
 
   install_linq_pad
 }
-
 
 #--------------------------------main-----------------------------------
 
@@ -961,8 +968,7 @@ main() {
     esac
   done
 
-  if (($EUID == 0)); then
-
+  if [[ $EUID == 0 ]]; then
     ERROR "do not run this script as root, the program will ask you for sudo privilege if needed."
     exit 1
   fi
@@ -1048,18 +1054,18 @@ EOF
 
   Yellow "-----------------------------------------------finished-----------------------------------------------"
   INFO "\n\ninstallation finished.
-   things to do now:
-    1) reboot pc
-    2) configure vpn (nekoray or clash)
-    3) install telegram
-    4) install docker and lazydocker
-    5) install hyprland if you want form
-      5.1)	https://github.com/JaKooLit/Arch-Hyprland
-      5.2)	https://github.com/RedBlizard/hyprland-installation (work in progress)
-    6) install cheat and delta (due to gitlab restrictions)
-    7) configure timeshift for system snapshots
+things to do now:
+1) reboot pc
+2) configure vpn (nekoray or clash)
+3) install telegram
+4) install docker and lazydocker
+5) install hyprland if you want form
+5.1)	https://github.com/JaKooLit/Arch-Hyprland
+5.2)	https://github.com/RedBlizard/hyprland-installation (work in progress)
+6) install cheat and delta (due to gitlab restrictions)
+7) configure timeshift for system snapshots
 
-    good luck!"
+good luck!"
 
   if ask_prompt "do you want to restart now?"; then
     WARN "rebooting in 10 seconds."

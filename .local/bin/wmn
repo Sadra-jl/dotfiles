@@ -1,0 +1,23 @@
+#! /bin/python
+import subprocess
+
+
+# Function to get the name of the current window manager
+def get_window_manager():
+    try:
+        # Use the 'loginctl' command to find the current session
+        session = subprocess.check_output("loginctl show-session $(loginctl | grep $(whoami) | awk '{print $1}') -p Type", shell=True).decode().strip()
+        
+        # Check if the session type is 'wayland'
+        if 'wayland' in session:
+            # Use 'env' to print environment variables and grep for 'XDG_SESSION_DESKTOP'
+            wm_info = subprocess.check_output("env | grep XDG_CURRENT_DESKTOP", shell=True).decode().strip()
+            wm_name = wm_info.split('=')[1] if '=' in wm_info else 'Unknown'
+            return wm_name
+        else:
+            return 'Not a Wayland session'
+    except subprocess.CalledProcessError as e:
+        return f'An error occurred: {e}'
+
+# Print the name of the window manager
+print(get_window_manager())

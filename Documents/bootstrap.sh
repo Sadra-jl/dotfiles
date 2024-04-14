@@ -262,10 +262,11 @@ configure_zoxide() {
   fi
 }
 
+
 is_package_installed(){
     package="$1"
     check="$(sudo yay -Qs --color always "${package}" | grep "local" | grep "${package} ")"
-    return "$(test -n "${check}")"
+    test -n "${check}"
 }
 
 install_packages() {
@@ -309,10 +310,28 @@ if you accidently passed no its time control+c now and start over."
     done
 
     #"All pacman packages are already installed."
-    test -z "${to_install[@]}" && return
+    test -z "${to_install[*]}" && return
 
     printf "Package not installed:\n%s\n" "${to_install[@]}"
-    yay -S --needed "$pacman_confirm" "${to_install[@]}"
+    yay -S "$pacman_confirm" --needed  "${to_install[@]}"
+}
+
+install_yay() {
+    pacman -Qs yay > /dev/null && INFO "yay is already installed!" && return
+
+    pacman --noconfirm --needed -S "base-devel"
+
+    SCRIPT=$(realpath "$0")
+    temp_path=$(dirname "$SCRIPT")
+
+    echo2 "$temp_path"
+
+    git clone https://aur.archlinux.org/yay-git.git ~/yay-git
+    cd "$HOME/yay-git" || (ERROR "could not cd to $HOME/yay-git" && exit 1)
+    makepkg -si
+
+    cd "$temp_path" || (ERROR "could not cd to $HOME/yay-git" && exit 1)
+    INFO "yay has been installed successfully."
 }
 
 optional_packages() {
@@ -599,9 +618,9 @@ configure_nvidia() {
 
 change_shell() {
   local user=$1
-  ask_prompt "change shell to fish user: ${orange}${user}? y/n:  " || (echo "user shell remained unchanged" && return)
+  ask_prompt "change shell to fish user: ${orange}${user}? y/n:  " || echo "user shell remained unchanged" && return
 
-  if sudo chsh "--shell $(which fish) ${user}"; then
+  if sudo chsh "-s $(which fish) ${user}"; then
     Warn "shell changed. restart terminal or source profile."
     return
   fi
@@ -829,9 +848,9 @@ install_zen_kernel() {
 install_fonts() {
   local font_packages=(ttf-fira-code ttc-iosevka ttf-ms-win11-auto ttf-ms-win10-auto ttf-jetbrains-mono-nerd cantarell-fonts ttf-noto-nerd ttf-nerd-fonts-symbols-mono ttf-font-awesome awesome-terminal-fonts ttf-bitstream-vera ttf-dejavu ttf-liberation noto-fonts-extra ttf-opensans adobe-source-sans-pro-fonts terminus-font ttf-droid ttf-hack ttf-ms-fonts steam-fonts)
 
-    ask_prompt "install fonts? (y/n):	" || return
+  ask_prompt "install fonts? (y/n):	" || return
 
-  install_packages font_packages "no"
+  install_packages font_packages "no" "--noconfirm"
 }
 
 dotnet_installer() {
@@ -1018,7 +1037,11 @@ EOF
   echo -e "$reset"
 
   INFO "updating system first"
-  yay --noconfirm -Syu
+  yay --noconfirm -Syu   
+
+  Yellow "---------------------------------------------install yay----------------------------------------------"
+  install_yay
+  echo2
 
   Yellow "--------------------------------------------Change Mirrors--------------------------------------------"
   change_mirrors
@@ -1040,7 +1063,7 @@ EOF
   install_packages pkgs "yes"
   echo2
 
-  Yellow "-----------------------------------------configuring system-------------------------------------------"
+  Yellow "------------------------------------------configuring system------------------------------------------"
   configure_system
   echo2
 

@@ -13,10 +13,10 @@ require("swenv").setup({
     end
 })
 
--- lvim.builtin.which_key.mappings["c"] = {
---     name = "python",
---     c = {
---         "<cmd>lua require('swenv.api').pick_env()<cr>",
---         "choose environment"
---     },
--- }
+lvim.builtin.which_key.mappings["C"] = {
+    name = "python",
+    c = {
+        "<cmd>lua require('swenv.api').pick_venv()<cr>",
+        "choose environment"
+    },
+}

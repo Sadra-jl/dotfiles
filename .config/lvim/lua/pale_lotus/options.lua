@@ -38,9 +38,11 @@ local fish_paths = _set({
 })
 
 -- If the current system shell or the `shell` option is set to /usr/bin/fish then revert to sh
-if fish_paths[os.getenv('SHELL')]  or fish_paths[vim.opt.shell] then
-    vim.opt.shell = "/bin/bash"
-else
-   -- Else default to the system current shell.
-   vim.opt.shell = os.getenv('SHELL')
-end
+-- if fish_paths[os.getenv('SHELL')]  or fish_paths[vim.opt.shell] then
+--     vim.opt.shell = "/bin/bash"
+-- else
+--    -- Else default to the system current shell.
+--    vim.opt.shell = os.getenv('SHELL')
+-- end
+--
+

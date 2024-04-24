@@ -66,10 +66,10 @@ steam_packages=(steam lutris steam-native-runtime dxvk-bin vkd3d-proton winetric
 echo2() { echo -e "$@" >&2; }
 
 # following 30 lines is from endeavourOs scripts im sure this error is not a big deal and will work
-Red() { echo2 "$red""$@""$reset"; }
-Yellow() { echo2 "$yellow""$@""$reset"; }
-Blue() { echo2 "$blue""$@""$reset"; }
-Orange() { echo2 "$orange""$@""$reset"; }
+Red() { echo2 "$red""$*""$reset"; }
+Yellow() { echo2 "$yellow""$*""$reset"; }
+Blue() { echo2 "$blue""$*""$reset"; }
+Orange() { echo2 "$orange""$*""$reset"; }
 
 WARN() {
   local msg="$1"
@@ -125,7 +125,7 @@ backup() {
     ((suffix++))
   done
 
-  mv "$item" "$backup_dir$suffix"
+  sudo mv "$item" "$backup_dir$suffix"
 }
 
 #ask user yes no questions
@@ -273,10 +273,9 @@ install_packages() {
 
   local -n packages_to_install=$1
   local terminate_app_str=$2
-  local pacman_confirm=${3:"--noconfirm"}
+  local pacman_confirm=${3:--noconfirm}
 
   INFO "following packages will be installed:"
-
   #readarray -d " " -t array <<< "$packages_to_install"
 
   #for (( n=0; n < ${#array[*]}; n++)) do
@@ -774,7 +773,7 @@ change_mirrors() {
     #updating arch mirrorlist
 
     if ask_prompt "do want to backup mirrorlist?(recommended) y/n:	"; then
-    backup /etc/pacman.d/mirrorlist
+        backup /etc/pacman.d/mirrorlist
     fi
 
     local http="--protocol http"
@@ -782,11 +781,11 @@ change_mirrors() {
     local protocol="$http $https"
 
     if ! eval "$(ask_prompt "do you want to include http? y/n:	")"; then
-    protocol=$https
+        protocol=$https
     fi
 
     INFO "updating arch mirrorlist"
-    rate-mirrors --allow-root "$protocol" arch | sudo tee /etc/pacman.d/mirrorlist
+    rate-mirrors --allow-root $protocol arch | sudo tee /etc/pacman.d/mirrorlist
 
     #updating	endeavourOs mirrorlist
     ask_prompt "do you want to update EndeavourOs mirrorlist as well?" || return
@@ -797,7 +796,7 @@ change_mirrors() {
 
     INFO "updating endeavourOs mirrorlist"
 
-    rate-mirrors --allow-root "$protocol" endeavouros | sudo tee /etc/pacman.d/endeavouros-mirrorlist
+    rate-mirrors --allow-root $protocol endeavouros | sudo tee /etc/pacman.d/endeavouros-mirrorlist
 }
 
 yay_clean_up() {

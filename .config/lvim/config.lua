@@ -1,3 +1,4 @@
+-- load all source files in lua directory
 local info = debug.getinfo(1, 'S')
 local module_directory = string.match(info.source, '^@?(.*)/') or "."
 local module_filename = string.match(info.source, '/([^/]*)$')

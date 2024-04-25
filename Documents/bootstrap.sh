@@ -43,7 +43,7 @@ reset="\033[0m"
 
 #list of packages to install
 
-pkgs=(linux-headers bottom zathura zathura-djvu zathura-pdf-mupdf bluez bluez-utils musicbee wl-clipboard typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf discord skypeforlinux-bin timeshift calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch)
+pkgs=(linux-headers bottom zathura zathura-djvu zathura-pdf-mupdf bluez bluez-utils musicbee wl-clipboard typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf discord skypeforlinux-bin  calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch)
 
 #todo add dnSpyEx (hard to get it working on linux)
 dotnet_packages=(dotnet-host-bin dotnet-runtime-bin dotnet-sdk-bin dotnet-targeting-pack-bin)
@@ -525,6 +525,10 @@ configure_btrfs() {
       fi
     fi
   done
+
+  ask_prompt "btrfs-assistant is installed remove timeshift?" || return
+
+  sudo pacman -Rns --noconfirm timeshift
 }
 
 configure_cpu() {

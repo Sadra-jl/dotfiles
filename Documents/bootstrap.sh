@@ -794,7 +794,7 @@ change_mirrors() {
     fi
 
     INFO "updating arch mirrorlist"
-    rate-mirrors --allow-root $protocol arch | sudo tee /etc/pacman.d/mirrorlist
+    rate-mirrors --allow-root "$protocol" arch | sudo tee /etc/pacman.d/mirrorlist
 
     #updating	endeavourOs mirrorlist
     ask_prompt "do you want to update EndeavourOs mirrorlist as well?" || return
@@ -805,7 +805,7 @@ change_mirrors() {
 
     INFO "updating endeavourOs mirrorlist"
 
-    rate-mirrors --allow-root $protocol endeavouros | sudo tee /etc/pacman.d/endeavouros-mirrorlist
+    rate-mirrors --allow-root "$protocol" endeavouros | sudo tee /etc/pacman.d/endeavouros-mirrorlist
 }
 
 yay_clean_up() {

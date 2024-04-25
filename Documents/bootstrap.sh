@@ -125,7 +125,7 @@ backup() {
     ((suffix++))
   done
 
-  sudo mv "$item" "$backup_dir$suffix"
+  sudo cp "$item" "$backup_dir$suffix"
 }
 
 #ask user yes no questions

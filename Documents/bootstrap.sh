@@ -528,7 +528,9 @@ configure_btrfs() {
 
   ask_prompt "btrfs-assistant is installed remove timeshift?" || return
 
+  INFO "removing timeshift"
   sudo pacman -Rns --noconfirm timeshift
+  INFO "removed."
 }
 
 configure_cpu() {

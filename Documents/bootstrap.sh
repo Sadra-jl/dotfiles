@@ -117,6 +117,7 @@ EOF
 # Function to backup a file or directory
 backup() {
   local item="$1"
+  local operation=${2:-mv}
   local backup_dir="$item.back"
 
   # If .back already exists, find the next available numeric suffix
@@ -125,7 +126,7 @@ backup() {
     ((suffix++))
   done
 
-  sudo cp "$item" "$backup_dir$suffix"
+  sudo "$operation" "$item" "$backup_dir$suffix"
 }
 
 #ask user yes no questions
@@ -193,14 +194,22 @@ change_dns() {
   ask_prompt "use Beshkan DNS servers to bypass restriction?$reset ($yellow this will disable NetworkManager auto DNS assignment$reset) y/n:	" || return
 
   backup /etc/NetworkManager/NetworkManager.conf
-  echo -e "[Main]\ndns=none\n#plugins=ifcfg-rh,ibft" | sudo tee -a /etc/NetworkManager/NetworkManager.conf
+
+
+  if ! grep "dns=none" /etc/NetworkManager/NetworkManager.conf &> /dev/null ; then
+    echo -e "[Main]\ndns=none\n#plugins=ifcfg-rh,ibft" | sudo tee -a /etc/NetworkManager/NetworkManager.conf
+  fi
+  
+  sudo systemctl reload NetworkManager
   sudo systemctl restart NetworkManager.service
 
   echo -e "$yellow_b $red waiting 10 seconds for restarting NetworkManager.service$reset\n"
   sleep 10
 
   backup /etc/resolv.conf
-  echo -e "nameserver 181.41.194.177\nnameserver 181.41.194.186" | sudo tee -a /etc/resolv.conf
+  if ! grep -e "nameserver 181.41.194.177" -e "nameserver 181.41.194.186" /etc/resolv.conf; then
+    echo -e "nameserver 181.41.194.177\nnameserver 181.41.194.186" | sudo tee -a /etc/resolv.conf
+  fi
 }
 
 fisher_installer() {
@@ -238,7 +247,7 @@ configure_zoxide() {
   INFO "configuring zoxide..."
 
   if ! grep "$bash_config" ~/.bashrc &>/dev/null; then
-    echo "$bash_config" >>~/.bashrc
+    echo "$bash_config" >> ~/.bashrc
   fi
 
   if ! grep "$fish_config" ~/.config/fish/config.fish &>/dev/null; then
@@ -646,7 +655,7 @@ set_fish_aliases() {
   local alias_path=~/.config/fish/conf.d/alias.fish
 
   if [ -f "$alias_path" ] && [ "$(ask_prompt "do you want to backup $alias_path?")" ]; then
-    backup "$alias_path"
+    backup "$alias_path" cp
   fi
 
   touch "$alias_path"
@@ -773,7 +782,7 @@ change_mirrors() {
     #updating arch mirrorlist
 
     if ask_prompt "do want to backup mirrorlist?(recommended) y/n:	"; then
-        backup /etc/pacman.d/mirrorlist
+        backup /etc/pacman.d/mirrorlist cp
     fi
 
     local http="--protocol http"
@@ -790,7 +799,7 @@ change_mirrors() {
     #updating	endeavourOs mirrorlist
     ask_prompt "do you want to update EndeavourOs mirrorlist as well?" || return
 
-    ask_prompt "do want to backup endeavouros-mirrorlist?(recommended) y/n:	" && backup /etc/pacman.d/endeavouros-mirrorlist
+    ask_prompt "do want to backup endeavouros-mirrorlist?(recommended) y/n:	" && backup /etc/pacman.d/endeavouros-mirrorlist cp
 
     ask_prompt "do you want to include http? y/n:	" && protocol="$http $https" || protocol=$https
 

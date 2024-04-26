@@ -654,6 +654,8 @@ configure_btrfs() {
     fi
   done
 
+  is_package_installed "timeshift" || return
+
   ask_prompt "btrfs-assistant is installed remove timeshift?" || return
 
   INFO "removing timeshift"

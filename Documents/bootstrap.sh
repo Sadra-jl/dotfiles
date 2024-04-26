@@ -202,51 +202,63 @@ configure_plain_dns(){
 }
 
 configure_DoH(){
-    is_package_install "unbound" || sudo pacman -S --noconfirm --needed "unbound"
-
-    grep "178.22.122.100@853#free.shecan.ir" /etc/unbound/unbound.conf && WARN "it is already configured; returning" && return
-
-    sudo tee /etc/unbound/unbound.conf  <<EOF
-forward-zone:
-  name: "."
-  forward-tls-upstream: yes
-  forward-addr: 178.22.122.100@853#free.shecan.ir
-  forward-addr: 185.51.200.2@853#free.shecan.ir
-EOF
-
-    INFO "configuration added successfully."
-    INFO "enabling and starting unbound service..."
-
-    sudo systemctl enable unbound
-    sudo systemctl start unbound
+    is_package_install "dns-over-https" || sudo pacman -S --noconfirm --needed "dns-over-https"
 
     backup /etc/resolv.conf
 
-    echo "nameserver 27.0.0.1" > /etc/resolv.conf
+    grep "nameserver 127.0.0.1" /etc/resolv.conf || echo "nameserver 127.0.0.1" | sudo tee /etc/resolv.conf
+
+    grep 'url = "https://free.shecan.ir/dns-query"' /etc/dns-over-https/doh-client.conf && WARN "it is already configured; returning" && return
+
+    INFO "Configuring DNS over HTTPS..."
+    cat <<EOF | sudo tee /etc/dns-over-https/doh-client.conf
+    listen_addresses = ['127.0.0.1:53', '[::1]:53']
+    url = "https://free.shecan.ir/dns-query"
+EOF
+
+    INFO "Disable systemd-resolved to avoid conflicts"
+    sudo systemctl stop systemd-resolved
+    sudo systemctl disable systemd-resolved
+
+    INFO "Enable and start DNS-over-HTTPS client"
+    sudo systemctl enable doh-client
+    sudo systemctl start doh-client
 
     INFO "done."
 }
 
 configure_DoT() {
     is_package_install "stubby" || sudo pacman -S --noconfirm --needed "stubby"
-    grep "address_data: 178.22.122.100" /etc/stubby/stubby.yml && WARN "it is already configured; returning" && return
-    sudo tee /etc/stubby/stubby.yml <<EOF
-upstream_recursive_servers:
-- address_data: 178.22.122.100
-tls_auth_name: "free.shecan.ir"
-tls_port: 853
-- address_data: 185.51.200.2
-tls_auth_name: "free.shecan.ir"
-tls_port: 853
 
+    backup /etc/resolv.conf
+    grep "nameserver 127.0.0.1" /etc/resolv.conf || echo "nameserver 127.0.0.1" | sudo tee /etc/resolv.conf
+
+    grep "address_data: 178.22.122.100" /etc/stubby/stubby.yml && WARN "it is already configured; returning" && return
+
+    INFO "Configuring DNS over TLS..."
+
+cat <<EOF | sudo tee /etc/stubby/stubby.yml
+resolution_type: GETDNS_RESOLUTION_STUB
+dns_transport_list:
+  - GETDNS_TRANSPORT_TLS
+tls_authentication: GETDNS_AUTHENTICATION_REQUIRED
+tls_query_padding_blocksize: 128
+edns_client_subnet_private: 1
+round_robin_upstreams: 1
+idle_timeout: 10000
+listen_addresses:
+  - 127.0.0.1@53
+  - 0::1@53
+upstream_recursive_servers:
+  - address_data: 178.22.122.100
+    tls_auth_name: "free.shecan.ir"
+  - address_data: 185.51.200.2
+    tls_auth_name: "free.shecan.ir"
 EOF
 
     sudo systemctl enable stubby
     sudo systemctl start stubby
 
-    backup /etc/resolv.conf
-
-    echo "nameserver 27.0.0.1" > /etc/resolv.conf
 
     INFO "done."
 }
@@ -263,7 +275,7 @@ change_dns() {
   if ! grep "dns=none" /etc/NetworkManager/conf.d/90-dns-none.conf &>/dev/null; then
 
     sudo tee -a /etc/NetworkManager/conf.d/90-dns-none.conf << 'EOF'
-[Main]
+[main]
 dns=none
 rc-manager=unmanaged
 #plugins=ifcfg-rh,ibft

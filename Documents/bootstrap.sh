@@ -33,6 +33,7 @@ yellow="\033[1;93m "
 blue="\033[38:5:45m"
 white="\033[38:5:255m"
 orange='\033[0;33m'
+purple='\033[1;95m'
 
 #background
 red_b="\033[48:5:1m"
@@ -43,7 +44,7 @@ reset="\033[0m"
 
 #list of packages to install
 
-pkgs=(linux-headers bottom zathura zathura-djvu zathura-pdf-mupdf bluez bluez-utils musicbee wl-clipboard typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf discord skypeforlinux-bin  calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch)
+pkgs=(linux-headers bottom zathura zathura-djvu zathura-pdf-mupdf bluez bluez-utils musicbee wl-clipboard typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf discord skypeforlinux-bin calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch)
 
 #todo add dnSpyEx (hard to get it working on linux)
 dotnet_packages=(dotnet-host-bin dotnet-runtime-bin dotnet-sdk-bin dotnet-targeting-pack-bin)
@@ -126,7 +127,9 @@ backup() {
     ((suffix++))
   done
 
-  sudo "$operation" "$item" "$backup_dir$suffix"
+    if [ -f "$item" ]; then
+        sudo "$operation" "$item" "$backup_dir$suffix"
+    fi
 }
 
 #ask user yes no questions
@@ -190,26 +193,140 @@ install_optional_package() {
   yay -S --needed --noconfirm "${selected[@]}"
 }
 
-change_dns() {
-  ask_prompt "use Beshkan DNS servers to bypass restriction?$reset ($yellow this will disable NetworkManager auto DNS assignment$reset) y/n:	" || return
+configure_plain_dns(){
+      backup /etc/resolv.conf
+      if ! grep -e "nameserver 178.22.122.100" -e "nameserver 185.51.200.2" /etc/resolv.conf; then
+        echo -e "nameserver 178.22.122.100\nnameserver 185.51.200.2" | sudo tee /etc/resolv.conf
+      fi
 
+}
+
+configure_DoH(){
+    is_package_install "unbound" || sudo pacman -S --noconfirm --needed "unbound"
+
+    grep "178.22.122.100@853#free.shecan.ir" /etc/unbound/unbound.conf && WARN "it is already configured; returning" && return
+
+    sudo tee /etc/unbound/unbound.conf  <<EOF
+forward-zone:
+  name: "."
+  forward-tls-upstream: yes
+  forward-addr: 178.22.122.100@853#free.shecan.ir
+  forward-addr: 185.51.200.2@853#free.shecan.ir
+EOF
+
+    INFO "configuration added successfully."
+    INFO "enabling and starting unbound service..."
+
+    sudo systemctl enable unbound
+    sudo systemctl start unbound
+
+    backup /etc/resolv.conf
+
+    echo "nameserver 27.0.0.1" > /etc/resolv.conf
+
+    INFO "done."
+}
+
+configure_DoT() {
+    is_package_install "stubby" || sudo pacman -S --noconfirm --needed "stubby"
+    grep "address_data: 178.22.122.100" /etc/stubby/stubby.yml && WARN "it is already configured; returning" && return
+    sudo tee /etc/stubby/stubby.yml <<EOF
+upstream_recursive_servers:
+- address_data: 178.22.122.100
+tls_auth_name: "free.shecan.ir"
+tls_port: 853
+- address_data: 185.51.200.2
+tls_auth_name: "free.shecan.ir"
+tls_port: 853
+
+EOF
+
+    sudo systemctl enable stubby
+    sudo systemctl start stubby
+
+    backup /etc/resolv.conf
+
+    echo "nameserver 27.0.0.1" > /etc/resolv.conf
+
+    INFO "done."
+}
+
+
+change_dns() {
+
+  ask_prompt "use Shkan DNS servers to bypass restriction?$reset ($yellow this will disable NetworkManager auto DNS assignment$reset) y/n:	" || return
+
+  INFO "Disabling NetworkManager..."
+  
   backup /etc/NetworkManager/NetworkManager.conf
 
+  if ! grep "dns=none" /etc/NetworkManager/conf.d/90-dns-none.conf &>/dev/null; then
 
-  if ! grep "dns=none" /etc/NetworkManager/NetworkManager.conf &> /dev/null ; then
-    echo -e "[Main]\ndns=none\n#plugins=ifcfg-rh,ibft" | sudo tee -a /etc/NetworkManager/NetworkManager.conf
+    sudo tee -a /etc/NetworkManager/conf.d/90-dns-none.conf << 'EOF'
+[Main]
+dns=none
+rc-manager=unmanaged
+#plugins=ifcfg-rh,ibft
+EOF
   fi
-  
+
   sudo systemctl reload NetworkManager
   sudo systemctl restart NetworkManager.service
 
   echo -e "$yellow_b $red waiting 10 seconds for restarting NetworkManager.service$reset\n"
   sleep 10
+  INFO "Done"
 
-  backup /etc/resolv.conf
-  if ! grep -e "nameserver 181.41.194.177" -e "nameserver 181.41.194.186" /etc/resolv.conf; then
-    echo -e "nameserver 181.41.194.177\nnameserver 181.41.194.186" | sudo tee -a /etc/resolv.conf
-  fi
+
+  echo2 "$purple" "there are 3 major mehods to set up DNS 'DNS over TLS' 'DNS over HTTPS' 'Plain DNS'" "$reset"
+  cat <<EOF
+Plain DNS:
+    regular dns that is unencrypted and any one between you and your IPS can see it.
+    which do not provide encrypted communication for DNS queries
+
+DNS over HTTPS (DoH):
+    provide encrypted communication for DNS queries
+    and uses the HTTPS protocol
+    it is firewall friendly, have browser integration (like firefox natively support it)
+    and hides DNS queries within regular HTTPS traffic.
+    but it may bypass local DNS policies
+
+DNS over TLS
+    provide encrypted communication for DNS queries
+    and uses the TLS protocol
+    it is a standard, widely supported and has strong Authentication
+    but it may have some issues with firewall.
+EOF
+    
+
+  echo2 "$purple" "which one to choose?" "$reset"
+  cat <<EOF
+Privacy: If privacy is your primary concern, both DoT and DoH offer encryption, but DoH may be more convenient due to its use of port 443.
+Compatibility: Consider what your DNS resolver supports. Some providers offer both options.
+Network Environment: If port 853 is blocked, DoH might be a better choice.
+Ease of Setup: DoH might be easier to set up due to its use of HTTPS.
+EOF
+
+echo2 "$purple" "choose the method to use" "$reset"
+
+  while true; do
+
+    echo -e "${blue}DNS(1) DoH(2) DoT(3)$reset" >&2
+    echo -en "${blue}enter: $reset" >&2
+
+    read -r yn
+
+    case $yn in
+    [1]*) configure_plain_dns && break;;
+    [2]*) configure_DoH  && break;;
+    [3]*) configure_DoTek && break ;;
+    *) ERROR "Please answer yes or no." ;;
+    esac
+  done
+
+
+  INFO "Dns changed successfully."
+
 }
 
 fisher_installer() {
@@ -247,7 +364,7 @@ configure_zoxide() {
   INFO "configuring zoxide..."
 
   if ! grep "$bash_config" ~/.bashrc &>/dev/null; then
-    echo "$bash_config" >> ~/.bashrc
+    echo "$bash_config" >>~/.bashrc
   fi
 
   if ! grep "$fish_config" ~/.config/fish/config.fish &>/dev/null; then
@@ -271,11 +388,10 @@ configure_zoxide() {
   fi
 }
 
-
-is_package_installed(){
-    package="$1"
-    check="$(sudo yay -Qs --color always "${package}" | grep "local" | grep "${package} ")"
-    test -n "${check}"
+is_package_installed() {
+  package="$1"
+  check="$(sudo yay -Qs --color always "${package}" | grep "local" | grep "${package} ")"
+  test -n "${check}"
 }
 
 install_packages() {
@@ -308,38 +424,38 @@ if you accidently passed no its time control+c now and start over."
 
   INFO "installing packages"
 
-    for pkg in "${packages_to_install[@]}"; do
-        if is_package_installed "${pkg}"; then
-            echo "${pkg} is already installed."
-            continue
-        fi
+  for pkg in "${packages_to_install[@]}"; do
+    if is_package_installed "${pkg}"; then
+      echo "${pkg} is already installed."
+      continue
+    fi
 
-        to_install+=("${pkg}")
-    done
+    to_install+=("${pkg}")
+  done
 
-    #"All pacman packages are already installed."
-    test -z "${to_install[*]}" && return
+  #"All pacman packages are already installed."
+  test -z "${to_install[*]}" && return
 
-    printf "Package not installed:\n%s\n" "${to_install[@]}"
-    yay -S "$pacman_confirm" --needed  "${to_install[@]}"
+  printf "Package not installed:\n%s\n" "${to_install[@]}"
+  yay -S "$pacman_confirm" --needed "${to_install[@]}"
 }
 
 install_yay() {
-    pacman -Qs yay > /dev/null && INFO "yay is already installed!" && return
+  pacman -Qs yay >/dev/null && INFO "yay is already installed!" && return
 
-    pacman --noconfirm --needed -S "base-devel"
+  pacman --noconfirm --needed -S "base-devel"
 
-    SCRIPT=$(realpath "$0")
-    temp_path=$(dirname "$SCRIPT")
+  SCRIPT=$(realpath "$0")
+  temp_path=$(dirname "$SCRIPT")
 
-    echo2 "$temp_path"
+  echo2 "$temp_path"
 
-    git clone https://aur.archlinux.org/yay-git.git ~/yay-git
-    cd "$HOME/yay-git" || (ERROR "could not cd to $HOME/yay-git" && exit 1)
-    makepkg -si
+  git clone https://aur.archlinux.org/yay-git.git ~/yay-git
+  cd "$HOME/yay-git" || (ERROR "could not cd to $HOME/yay-git" && exit 1)
+  makepkg -si
 
-    cd "$temp_path" || (ERROR "could not cd to $HOME/yay-git" && exit 1)
-    INFO "yay has been installed successfully."
+  cd "$temp_path" || (ERROR "could not cd to $HOME/yay-git" && exit 1)
+  INFO "yay has been installed successfully."
 }
 
 optional_packages() {
@@ -753,7 +869,7 @@ configure_system() {
 
 install_scintific() {
 
-  ask_prompt "install scientific apps? $yellow you may not need them.$reset (y/n):  "  || return
+  ask_prompt "install scientific apps? $yellow you may not need them.$reset (y/n):  " || return
 
   install_packages scientific_packages "no"
 
@@ -771,54 +887,58 @@ install_scintific() {
 
 change_mirrors() {
 
-    ask_prompt "change mirrors? (rate-mirrors program will be installed) y/n:	" || return
+  ask_prompt "change mirrors? (rate-mirrors program will be installed) y/n:	" || return
 
-    INFO "installing rate-mirrors"
+  INFO "installing rate-mirrors"
 
-    ##it will get when its allreaddy installed and why break pipe here we can break it when calling it
-    ##lets not delete this block to remind us we have problems to solve.
+  ##it will get when its allreaddy installed and why break pipe here we can break it when calling it
+  ##lets not delete this block to remind us we have problems to solve.
 
-    #if ! $( yay -S --needed --noconfirm rate-mirrors) ; then
-    #ERROR "installation of \"rate-mirrors\" failed. try solve the problem manually and try again."
-    #exit
-    #fi
+  #if ! $( yay -S --needed --noconfirm rate-mirrors) ; then
+  #ERROR "installation of \"rate-mirrors\" failed. try solve the problem manually and try again."
+  #exit
+  #fi
 
-    yay -S --needed --noconfirm rate-mirrors
+  yay -S --needed --noconfirm rate-mirrors
 
-    #updating arch mirrorlist
+  #updating arch mirrorlist
 
-    if ask_prompt "do want to backup mirrorlist?(recommended) y/n:	"; then
-        backup /etc/pacman.d/mirrorlist cp
-    fi
+  if ask_prompt "do want to backup mirrorlist?(recommended) y/n:	"; then
+    backup /etc/pacman.d/mirrorlist cp
+  fi
 
-    local http="--protocol http"
-    local https="--protocol https"
-    local protocol="$http $https"
+  local http="--protocol http"
+  local https="--protocol https"
+  local protocol="$http $https"
 
-    if ! eval "$(ask_prompt "do you want to include http? y/n:	")"; then
-        protocol=$https
-    fi
+  if ! eval "$(ask_prompt "do you want to include http? y/n:	")"; then
+    protocol="$https"
+  fi
 
-    INFO "updating arch mirrorlist"
-    rate-mirrors --allow-root "$protocol" arch | sudo tee /etc/pacman.d/mirrorlist
+  INFO "updating arch mirrorlist"
+  eval "rate-mirrors --allow-root $protocol arch" | sudo tee /etc/pacman.d/mirrorlist
 
-    #updating	endeavourOs mirrorlist
-    ask_prompt "do you want to update EndeavourOs mirrorlist as well?" || return
+  #updating	endeavourOs mirrorlist
+  ask_prompt "do you want to update EndeavourOs mirrorlist as well?" || return
 
-    ask_prompt "do want to backup endeavouros-mirrorlist?(recommended) y/n:	" && backup /etc/pacman.d/endeavouros-mirrorlist cp
+  ask_prompt "do want to backup endeavouros-mirrorlist?(recommended) y/n:	" && backup /etc/pacman.d/endeavouros-mirrorlist cp
 
-    ask_prompt "do you want to include http? y/n:	" && protocol="$http $https" || protocol=$https
+  if ask_prompt "do you want to include http? y/n:	"; then
+      protocol="$http $https"
+  else
+      protocol=$https
+  fi
 
-    INFO "updating endeavourOs mirrorlist"
+  INFO "updating endeavourOs mirrorlist"
 
-    rate-mirrors --allow-root "$protocol" endeavouros | sudo tee /etc/pacman.d/endeavouros-mirrorlist
+  eval "rate-mirrors --allow-root $protocol endeavouros" | sudo tee /etc/pacman.d/endeavouros-mirrorlist
 }
 
 yay_clean_up() {
 
   local number_of_lines=$1
 
-    ask_prompt "do you want to clear package installation cache? (y/n):	" || return
+  ask_prompt "do you want to clear package installation cache? (y/n):	" || return
 
   Blue "usally it's good to have 3 last installed package cache for rollback system,
 but in my openion it's ok to remove them as they are fresh install and I hope furthur
@@ -841,22 +961,22 @@ updates wont force to rollback also having btrs timeshift will reduce the stress
   Yellow "--------------------------------------------"
   echo2
 
-    ask_prompt "prossed with operation?(y/n):	" || return
+  ask_prompt "prossed with operation?(y/n):	" || return
 
   yay -Scc
 }
 
 install_zen_kernel() {
 
-    WARN "zen kernel(or any over kernels over than vanila linux) may have some problems like for example pc may not shutdown properly sometimes. use at your own risk"
-    ask_prompt "do you want to install and change kernel to zen-kernel? (y/n):	" || return
+  WARN "zen kernel(or any over kernels over than vanila linux) may have some problems like for example pc may not shutdown properly sometimes. use at your own risk"
+  ask_prompt "do you want to install and change kernel to zen-kernel? (y/n):	" || return
 
-    INFO "current kernel: $(uname -r)"
+  INFO "current kernel: $(uname -r)"
 
-    sudo pacman --needed --noconfirm -S linux-zen linux-zen-headers
-    sudo grub-mkconfig -o /boot/grub/grub.cfg
+  sudo pacman --needed --noconfirm -S linux-zen linux-zen-headers
+  sudo grub-mkconfig -o /boot/grub/grub.cfg
 
-    INFO "install complited, check kernel after reboot with 'uname -r' command"
+  INFO "install complited, check kernel after reboot with 'uname -r' command"
 }
 
 install_fonts() {
@@ -879,7 +999,7 @@ dotnet_installer() {
 }
 
 install_dotnet_tools() {
-    ask_prompt "install dotnet cli tools? (y/n):  " || return
+  ask_prompt "install dotnet cli tools? (y/n):  " || return
 
   sudo dotnet workload update
 
@@ -891,7 +1011,7 @@ install_dotnet_tools() {
 }
 
 install_linq_pad() {
-    ask_prompt "install linq pad? (dotnet play ground good for sql; wine must been installed) (y/n):	" || return
+  ask_prompt "install linq pad? (dotnet play ground good for sql; wine must been installed) (y/n):	" || return
 
   local current_dir
   current_dir=$(pwd)
@@ -945,7 +1065,7 @@ using rider eap does not need any licencing as eap stands for early access progr
 its license trial is 30 days and you have to update to next eap.
 by installing rider you need to have license (or get it in other ways ;) )"
 
-    ask_prompt "install dotnet group? (sdk $(pacman -Qi dotnet-sdk | rg Version)) (y/n)?:	" || return
+  ask_prompt "install dotnet group? (sdk $(pacman -Qi dotnet-sdk | rg Version)) (y/n)?:	" || return
 
   install_packages dotnet_packages "no"
 
@@ -963,21 +1083,21 @@ by installing rider you need to have license (or get it in other ways ;) )"
 
     INFO "configuring fish shell auto completrion."
 
-    tee -a ~/.bashrc >/dev/null <<EOT
-# bash parameter completion for the dotnet CLI
+tee -a ~/.bashrc > /dev/null << 'EOF'
+    # bash parameter completion for the dotnet CLI
 
-function _dotnet_bash_complete()
-{
-local cur="${COMP_WORDS[COMP_CWORD]}" IFS=$'\n' # On Windows you may need to use use IFS=$'\r\n'
-local candidates
+    function _dotnet_bash_complete()
+    {
+        local cur="${COMP_WORDS[COMP_CWORD]}" IFS=$'\n' # On Windows you may need to use use IFS=$'\r\n'
+        local candidates
 
-read -d '' -ra candidates < <(dotnet complete --position "${COMP_POINT}" "${COMP_LINE}" 2>/dev/null)
+        read -d '' -ra candidates < <(dotnet complete --position "${COMP_POINT}" "${COMP_LINE}" 2>/dev/null)
 
-read -d '' -ra COMPREPLY < <(compgen -W "${candidates[*]:-}" -- "$cur")
-}
+        read -d '' -ra COMPREPLY < <(compgen -W "${candidates[*]:-}" -- "$cur")
+    }
 
-complete -f -F _dotnet_bash_complete dotnet
-EOT
+    complete -f -F _dotnet_bash_complete dotnet
+EOF
   fi
 
   if ask_prompt "do you want to instal ILSpy? it's dotnet decompiler (decompiling windows apps on linux is partial) (y/n):	"; then
@@ -1051,7 +1171,7 @@ EOF
   echo -e "$reset"
 
   INFO "updating system first"
-  yay --noconfirm -Syu   
+  yay --noconfirm -Syu
 
   Yellow "---------------------------------------------install yay----------------------------------------------"
   install_yay
@@ -1108,17 +1228,17 @@ EOF
   Yellow "-----------------------------------------------finished-----------------------------------------------"
   INFO "\n\ninstallation finished.
 things to do now:
-1) reboot pc
-2) configure vpn (nekoray or clash)
-3) install telegram
-4) install docker and lazydocker
-5) install hyprland if you want form
-5.1)	https://github.com/JaKooLit/Arch-Hyprland
-5.2)	https://github.com/RedBlizard/hyprland-installation (work in progress)
-6) install cheat and delta (due to gitlab restrictions)
-7) configure timeshift for system snapshots
+    1) reboot pc
+    2) configure vpn (nekoray or clash)
+    3) install telegram
+    4) install docker and lazydocker
+    5) install hyprland if you want form
+    5.1)	https://github.com/JaKooLit/Arch-Hyprland
+    5.2)	https://github.com/RedBlizard/hyprland-installation (work in progress)
+    6) install cheat and delta (due to gitlab restrictions)
+    7) configure timeshift for system snapshots
 
-good luck!"
+    good luck!"
 
   if ask_prompt "do you want to restart now?"; then
     WARN "rebooting in 10 seconds."

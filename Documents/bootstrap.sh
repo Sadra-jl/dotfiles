@@ -331,7 +331,7 @@ echo2 "$purple" "choose the method to use" "$reset"
     case $yn in
     [1]*) configure_plain_dns && break;;
     [2]*) configure_DoH  && break;;
-    [3]*) configure_DoTek && break ;;
+    [3]*) configure_DoT && break ;;
     *) ERROR "Please answer yes or no." ;;
     esac
   done

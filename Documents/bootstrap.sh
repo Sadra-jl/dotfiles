@@ -249,6 +249,8 @@ idle_timeout: 10000
 listen_addresses:
   - 127.0.0.1@53
   - 0::1@53
+  - 127.0.0.1@853
+  - 0::1@853
 upstream_recursive_servers:
   - address_data: 178.22.122.100
     tls_auth_name: "free.shecan.ir"

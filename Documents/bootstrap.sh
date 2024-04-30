@@ -656,6 +656,44 @@ configure_btrfs() {
     fi
   done
 
+  INFO "configuring btrfs..."
+
+  INFO "creating configs."
+  sudo snapper -c root create-config /
+  sudo chmod u=rwx,g=rx,o= /.snapshots # equal to 750
+  sudo chown :wheel /.snapshots
+
+  INFO "testing manual snapshots..."
+  sudo snapper -c root create -d "**Base system install**"
+  INFO "done..."
+
+  INFO "adding user."
+  sudo sed -i "s/ALLOW_USERS=\"\"/ALLOW_USERS=\"$(whoami)\"/" /etc/snapper/configs/root
+
+  INFO "changeing number of snapshots to be kept."
+
+  sudo sed -i 's/TIMELINE_LIMIT_HOURLY="[^"]*"/TIMELINE_LIMIT_HOURLY="3"/' /etc/snapper/configs/root
+  sudo sed -i 's/TIMELINE_LIMIT_DAILY="[^"]*"/TIMELINE_LIMIT_DAILY="5"/' /etc/snapper/configs/root
+  sudo sed -i 's/TIMELINE_LIMIT_WEEKLY="[^"]*"/TIMELINE_LIMIT_WEEKLY="7"/' /etc/snapper/configs/root
+  sudo sed -i 's/TIMELINE_LIMIT_MONTHLY="[^"]*"/TIMELINE_LIMIT_MONTHLY="1"/' /etc/snapper/configs/root
+  sudo sed -i 's/TIMELINE_LIMIT_QUARTERLY="[^"]*"/TIMELINE_LIMIT_QUARTERLY="0"/' /etc/snapper/configs/root
+  sudo sed -i 's/TIMELINE_LIMIT_YEARLY="[^"]*"/TIMELINE_LIMIT_YEARLY="0"/' /etc/snapper/configs/root
+
+  INFO "enabling snapshot services"
+  sudo systemctl enable --now snapper-timeline.timer
+  sudo systemctl enable --now snapper-cleanup.timer
+
+  if is_package_installed "locate"; then
+    INFO "locate is installed updating /etc/updatedb.conf"
+    sudo sed -i 's/\(PRUNENAMES = "\)[^"]*/& .snapshots/' /etc/updatedb.conf
+  fi
+
+  INFO "enabling grub auto generate after snapshots"
+  sudo systemctl enable --now grub-btrfs.path 
+
+  
+
+  INFO "done."
   is_package_installed "timeshift" || return
 
   ask_prompt "btrfs-assistant is installed remove timeshift?" || return
@@ -713,7 +751,7 @@ configure_grub() {
   INFO "Please be patient; we are doing a last check to see if GRUB is correctly configured for your hyprland installation with an NVIDIA GPU."
   INFO "For safety reasons, we are now making a backup of the GRUB configuration. See /etc/default/grub.bak"
 
-  backup /etc/default/grub
+  backup /etc/default/grub cp
 
   # Check if the nvidia-drm.modeset=1 option is present in GRUB_CMDLINE_LINUX
   if grep -q "nvidia-drm.modeset=1" /etc/default/grub; then
@@ -1255,6 +1293,16 @@ things to do now:
     7) configure timeshift for system snapshots
 
     good luck!"
+
+  filesystem_type=$(findmnt -n -o FSTYPE /)
+
+  if [ "$filesystem_type" == "btrfs" ]; then
+      INFO "btrfs is configured for the system you can use it's goodies."
+      INFO "for manual snapshots use the blow template."
+      INFO "\$ sudo snapper -c root create -d \"**Base system install**\""
+
+  fi
+
 
   if ask_prompt "do you want to restart now?"; then
     WARN "rebooting in 10 seconds."

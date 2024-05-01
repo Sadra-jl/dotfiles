@@ -44,7 +44,7 @@ reset="\033[0m"
 
 #list of packages to install
 
-pkgs=(linux-headers bottom zathura zathura-djvu zathura-pdf-mupdf bluez bluez-utils musicbee wl-clipboard typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf discord skypeforlinux-bin calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo ripgrep scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch)
+pkgs=(linux-headers bottom zathura zathura-djvu zathura-pdf-mupdf bluez bluez-utils musicbee wl-clipboard typora-free github-cli wine fish neovim visual-studio-code-bin paru nekoray-bin clash-for-windows-bin eza dust duf fd ripgrep hyperfine gping procs httpie httpie-desktop-bin curlie xh zoxide bat cava sd jq choose broot fzf discord skypeforlinux-bin calibre xsv clipboard nodejs npm age lazygit python-pip kitty cargo scc bat-extras navi hexyl postman-bin github-desktop-bin bash-completion bash-language-server dolphin-plugins dunst grub-hook update-grub tty-clock unimatrix-git vscode-json-languageserver git neofetch)
 
 #todo add dnSpyEx (hard to get it working on linux)
 dotnet_packages=(dotnet-host-bin dotnet-runtime-bin dotnet-sdk-bin dotnet-targeting-pack-bin)
@@ -274,7 +274,7 @@ change_dns() {
   
   backup /etc/NetworkManager/NetworkManager.conf
 
-  if ! grep "dns=none" /etc/NetworkManager/conf.d/90-dns-none.conf &>/dev/null; then
+  if ! grep -q "dns=none" /etc/NetworkManager/conf.d/90-dns-none.conf; then
 
     sudo tee -a /etc/NetworkManager/conf.d/90-dns-none.conf << 'EOF'
 [main]
@@ -377,11 +377,11 @@ configure_zoxide() {
 
   INFO "configuring zoxide..."
 
-  if ! grep "$bash_config" ~/.bashrc &>/dev/null; then
+  if ! grep -q "$bash_config" ~/.bashrc; then
     echo "$bash_config" >>~/.bashrc
   fi
 
-  if ! grep "$fish_config" ~/.config/fish/config.fish &>/dev/null; then
+  if ! grep -q "$fish_config" ~/.config/fish/config.fish; then
     echo "$fish_config" >>~/.config/fish/config.fish
   fi
 
@@ -394,7 +394,7 @@ configure_zoxide() {
     #and abow situation might occur when accidently sourcing multiple files or config.fish more
     #than once
 
-    if ! eval "$(grep 'alias cd="z"' ~/.config/fish/config.fish)" &>/dev/null; then
+    if ! eval "$(grep -q 'alias cd="z"' ~/.config/fish/config.fish)"; then
       echo -e 'alias cd="z"\n' >>~/.config/fish/config.fish
     fi
 
@@ -881,7 +881,7 @@ set_fish_aliases() {
 
   touch "$alias_path"
 
-  if ! grep "alias ls='eza --color=always --sort=size'" ~/.config/fish/conf.d/alias.fish &>/dev/null; then
+  if ! grep -q "alias ls='eza --color=always --sort=size'" ~/.config/fish/conf.d/alias.fish; then
     tee -a $alias_path >/dev/null <<EOT
 alias ls='eza --color=always --sort=size'
 
@@ -910,11 +910,11 @@ install_starship() {
   INFO "installing startship"
   sudo pacman --needed --noconfirm -S starship
 
-  if ! grep 'starship init fish | source' ~/.config/fish/config.fish &>/dev/null; then
+  if ! grep -q 'starship init fish | source' ~/.config/fish/config.fish; then
     echo 'starship init fish | source' >>~/.config/fish/config.fish
   fi
 
-  if ! grep 'starship init bash' ~/.bashrc &>/dev/null; then
+  if ! grep -q 'starship init bash' ~/.bashrc; then
     echo -e "eval \"$(starship init bash)\"" >>~/.bashrc
   fi
 

@@ -628,7 +628,7 @@ configure_bare_git() {
 # ------------------------------------------------------
 configure_btrfs() {
 
-  local btrfs_packages=("snapper" "snap-pac" "snapper-rollback" "btrfs-assistant" "btrfsmaintenance" "grub-btrfs")
+  local btrfs_packages=("snapper" "snapper-tools" "snapper-suport" "snap-pac-git" "snapper-rollback" "btrfs-assistant" "btrfsmaintenance" "grub-btrfs" )
   filesystem_type=$(findmnt -n -o FSTYPE /)
 
   if [ "$filesystem_type" != "btrfs" ]; then
@@ -668,44 +668,73 @@ configure_btrfs() {
   fi
 
 
+  if [ ! -f /etc/snapper/configs/root ]; then
+      INFO "creating configs."
+      sudo snapper -c root create-config /
+      sudo chmod u=rwx,g=rx,o= /.snapshots # equal to 750
+      sudo chown :wheel /.snapshots
 
-  INFO "creating configs."
-  sudo snapper -c root create-config /
-  sudo chmod u=rwx,g=rx,o= /.snapshots # equal to 750
-  sudo chown :wheel /.snapshots
+      INFO "testing manual snapshots..."
+      sudo snapper -c root create -d "initial snapshot"
+      INFO "done..."
 
-  INFO "testing manual snapshots..."
-  sudo snapper -c root create -d "**Base system install**"
-  INFO "done..."
+      INFO "adding user."
+      sudo sed -i "s/ALLOW_USERS=\"\"/ALLOW_USERS=\"$(whoami)\"/" /etc/snapper/configs/root
 
-  INFO "adding user."
-  sudo sed -i "s/ALLOW_USERS=\"\"/ALLOW_USERS=\"$(whoami)\"/" /etc/snapper/configs/root
+      INFO "changeing number of snapshots to be kept."
 
-  INFO "changeing number of snapshots to be kept."
+      sudo sed -i 's/TIMELINE_LIMIT_HOURLY="[^"]*"/TIMELINE_LIMIT_HOURLY="3"/' /etc/snapper/configs/root
+      sudo sed -i 's/TIMELINE_LIMIT_DAILY="[^"]*"/TIMELINE_LIMIT_DAILY="5"/' /etc/snapper/configs/root
+      sudo sed -i 's/TIMELINE_LIMIT_WEEKLY="[^"]*"/TIMELINE_LIMIT_WEEKLY="7"/' /etc/snapper/configs/root
+      sudo sed -i 's/TIMELINE_LIMIT_MONTHLY="[^"]*"/TIMELINE_LIMIT_MONTHLY="1"/' /etc/snapper/configs/root
+      sudo sed -i 's/TIMELINE_LIMIT_QUARTERLY="[^"]*"/TIMELINE_LIMIT_QUARTERLY="0"/' /etc/snapper/configs/root
+      sudo sed -i 's/TIMELINE_LIMIT_YEARLY="[^"]*"/TIMELINE_LIMIT_YEARLY="0"/' /etc/snapper/configs/root
 
-  sudo sed -i 's/TIMELINE_LIMIT_HOURLY="[^"]*"/TIMELINE_LIMIT_HOURLY="3"/' /etc/snapper/configs/root
-  sudo sed -i 's/TIMELINE_LIMIT_DAILY="[^"]*"/TIMELINE_LIMIT_DAILY="5"/' /etc/snapper/configs/root
-  sudo sed -i 's/TIMELINE_LIMIT_WEEKLY="[^"]*"/TIMELINE_LIMIT_WEEKLY="7"/' /etc/snapper/configs/root
-  sudo sed -i 's/TIMELINE_LIMIT_MONTHLY="[^"]*"/TIMELINE_LIMIT_MONTHLY="1"/' /etc/snapper/configs/root
-  sudo sed -i 's/TIMELINE_LIMIT_QUARTERLY="[^"]*"/TIMELINE_LIMIT_QUARTERLY="0"/' /etc/snapper/configs/root
-  sudo sed -i 's/TIMELINE_LIMIT_YEARLY="[^"]*"/TIMELINE_LIMIT_YEARLY="0"/' /etc/snapper/configs/root
+      INFO "enabling snapshot services"
+      sudo systemctl enable --now snapper-timeline.timer
+      sudo systemctl enable --now snapper-cleanup.timer
 
-  INFO "enabling snapshot services"
-  sudo systemctl enable --now snapper-timeline.timer
-  sudo systemctl enable --now snapper-cleanup.timer
-
-  if is_package_installed "locate"; then
-    INFO "locate is installed updating /etc/updatedb.conf"
-    sudo sed -i 's/\(PRUNENAMES = "\)[^"]*/& .snapshots/' /etc/updatedb.conf
+      if is_package_installed "locate"; then
+        INFO "locate is installed updating /etc/updatedb.conf"
+        sudo sed -i 's/\(PRUNENAMES = "\)[^"]*/& .snapshots/' /etc/updatedb.conf
+      fi
   fi
 
   INFO "makeing snapshots readonly."
   if ! grep -q rd.live.overlay.overlayfs=1; then
-    sudo sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT='[^']*/& rd.live.overlay.overlayfs=1/" /etc/default/grub
+    sudo sed -i '/^GRUB_CMDLINE_LINUX=""/a GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS="rd.live.overlay.overlayfs=1"' /etc/default/grub
     sudo grub-mkconfig -o /boot/grub/grub.cfg
   fi
 
-  INFO "done."
+  if [[ $(stat -c "%d:%i" /) != $(stat -c "%d:%i" /home) ]]; then
+    INFO "done."
+    return
+  fi
+
+  INFO "/home is on the seprate partition as /"
+  ask_prompt "set up configuration for /home too?" || (INFO "done." && return)
+
+  if [ ! -f /etc/snapper/configs/home ]; then
+      INFO "creating configs for /home"
+      sudo snapper -c home create-config /home
+
+      INFO "testing manual snapshots for /home..."
+      sudo snapper -c home create -d "initial snapshot"
+      INFO "done..."
+
+      INFO "adding user to /home."
+      sudo sed -i "s/ALLOW_USERS=\"\"/ALLOW_USERS=\"$(whoami)\"/" /etc/snapper/configs/home
+      INFO "done"
+
+      INFO "changeing number of snapshots to be kept."
+
+      sudo sed -i 's/TIMELINE_LIMIT_HOURLY="[^"]*"/TIMELINE_LIMIT_HOURLY="3"/' /etc/snapper/configs/home
+      sudo sed -i 's/TIMELINE_LIMIT_DAILY="[^"]*"/TIMELINE_LIMIT_DAILY="5"/' /etc/snapper/configs/home
+      sudo sed -i 's/TIMELINE_LIMIT_WEEKLY="[^"]*"/TIMELINE_LIMIT_WEEKLY="7"/' /etc/snapper/configs/home
+      sudo sed -i 's/TIMELINE_LIMIT_MONTHLY="[^"]*"/TIMELINE_LIMIT_MONTHLY="1"/' /etc/snapper/configs/home
+      sudo sed -i 's/TIMELINE_LIMIT_QUARTERLY="[^"]*"/TIMELINE_LIMIT_QUARTERLY="0"/' /etc/snapper/configs/home
+      sudo sed -i 's/TIMELINE_LIMIT_YEARLY="[^"]*"/TIMELINE_LIMIT_YEARLY="0"/' /etc/snapper/configs/home
+  fi
 }
 
 configure_cpu() {
@@ -807,7 +836,7 @@ configure_nvidia() {
 
 change_shell() {
   local user=$1
-  ask_prompt "change shell to fish user: ${orange}${user}? y/n:  " || echo "user shell remained unchanged" && return
+  ask_prompt "change shell to fish user: ${orange}${user}? y/n:  " || { echo "user shell remained unchanged";  return; }
 
   if sudo chsh "-s $(which fish) ${user}"; then
     Warn "shell changed. restart terminal or source profile."
@@ -1305,7 +1334,6 @@ things to do now:
       INFO "btrfs is configured for the system you can use it's goodies."
       INFO "for manual snapshots use the blow template."
       INFO "\$ sudo snapper -c root create -d \"**Base system install**\""
-
   fi
 
 

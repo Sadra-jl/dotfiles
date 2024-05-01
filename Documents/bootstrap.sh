@@ -700,8 +700,15 @@ configure_btrfs() {
       fi
   fi
 
-  if ! sudo btrfs sub; then
-    command ...
+  if ! sudo btrfs subvolume get-default  / | grep -q FS_TREE; then
+      INFO "setting default subvolume to @"
+
+      local id
+      id=$(sudo btrfs subvolume list / | awk '$NF == "@" {print $2}')
+
+      sudo btrfs subvolume set-default "$id" / 
+
+      INFO "done"
   fi
 
   INFO "makeing snapshots readonly."

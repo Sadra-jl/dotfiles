@@ -23,7 +23,7 @@
 
 #set -e
 
-#--------------------------------variables-----------------------------------
+#--------------------------------variables----------------------------------- 
 
 #define some colors
 
@@ -658,6 +658,17 @@ configure_btrfs() {
 
   INFO "configuring btrfs..."
 
+  if is_package_installed "timeshift" ; then
+    INFO "timeshift detected, removing timeshift."
+    sudo systemctl disable --now grub-btrfsd.service
+    sudo rm /etc/systemd/system/grub-btrfsd.service
+    sudo rm /etc/systemd/system/multi-user.target.wants/grub-btrfsd.service
+    sudo pacman -Rns --noconfirm timeshift
+    INFO "removed."
+  fi
+
+
+
   INFO "creating configs."
   sudo snapper -c root create-config /
   sudo chmod u=rwx,g=rx,o= /.snapshots # equal to 750
@@ -688,19 +699,13 @@ configure_btrfs() {
     sudo sed -i 's/\(PRUNENAMES = "\)[^"]*/& .snapshots/' /etc/updatedb.conf
   fi
 
-  INFO "enabling grub auto generate after snapshots"
-  sudo systemctl enable --now grub-btrfs.path 
-
-  
+  INFO "makeing snapshots readonly."
+  if ! grep -q rd.live.overlay.overlayfs=1; then
+    sudo sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT='[^']*/& rd.live.overlay.overlayfs=1/" /etc/default/grub
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
+  fi
 
   INFO "done."
-  is_package_installed "timeshift" || return
-
-  ask_prompt "btrfs-assistant is installed remove timeshift?" || return
-
-  INFO "removing timeshift"
-  sudo pacman -Rns --noconfirm timeshift
-  INFO "removed."
 }
 
 configure_cpu() {
@@ -1290,7 +1295,7 @@ things to do now:
     5.1)	https://github.com/JaKooLit/Arch-Hyprland
     5.2)	https://github.com/RedBlizard/hyprland-installation (work in progress)
     6) install cheat and delta (due to gitlab restrictions)
-    7) configure timeshift for system snapshots
+    7) configure timeshift for system snapshots (if not using btrfs)
 
     good luck!"
 

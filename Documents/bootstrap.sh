@@ -369,7 +369,7 @@ install_fish_plugins() {
 configure_zoxide() {
 
   local bash_config
-  bash_config="eval \"$(zoxide init bash)\""
+  bash_config="eval \"\$(zoxide init bash)\""
   local fish_config='zoxide init fish | source'
 
   ask_prompt "do you want to backup config.fish? (y/n):  " && backup ~/.config/fish/config.fish
@@ -698,6 +698,10 @@ configure_btrfs() {
         INFO "locate is installed updating /etc/updatedb.conf"
         sudo sed -i 's/\(PRUNENAMES = "\)[^"]*/& .snapshots/' /etc/updatedb.conf
       fi
+  fi
+
+  if ! sudo btrfs sub; then
+    command ...
   fi
 
   INFO "makeing snapshots readonly."

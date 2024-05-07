@@ -27,6 +27,11 @@
 
 #define some colors
 
+ok="$(tput setaf 2)[OK]$(tput sgr0)"
+error="$(tput setaf 1)[ERROR]$(tput sgr0)"
+note="$(tput setaf 3)[NOTE]$(tput sgr0)"
+warn="$(tput setaf 166)[WARN]$(tput sgr0)"
+
 #foreground
 red="\033[38:5:1m"
 yellow="\033[1;93m "
@@ -145,7 +150,7 @@ ask_prompt() {
     case $yn in
     [Yy]*) return 0 ;;
     [Nn]*) return 1 ;;
-    *) ERROR "Please answer yes or no." ;;
+    *) echo "${error}Please answer yes or no." ;;
     esac
   done
 }
@@ -172,7 +177,7 @@ install_optional_package() {
 
   ask_prompt "install $package_name? y/n:  " || return
 
-  WARN "apps to install options are:	"
+  echo "${note}apps to install options are:	"
 
   for option in "${package_options[@]}"; do
     Blue "$option"
@@ -414,7 +419,7 @@ install_packages() {
   local terminate_app_str=$2
   local pacman_confirm=${3:--noconfirm}
 
-  INFO "following packages will be installed:"
+  echo "${note}following packages will be installed:"
   #readarray -d " " -t array <<< "$packages_to_install"
 
   #for (( n=0; n < ${#array[*]}; n++)) do
@@ -440,7 +445,7 @@ if you accidently passed no its time control+c now and start over."
 
   for pkg in "${packages_to_install[@]}"; do
     if is_package_installed "${pkg}"; then
-      echo "${pkg} is already installed."
+      echo2 "${ok}${pkg} is already installed."
       continue
     fi
 
@@ -450,7 +455,7 @@ if you accidently passed no its time control+c now and start over."
   #"All pacman packages are already installed."
   test -z "${to_install[*]}" && return
 
-  printf "Package not installed:\n%s\n" "${to_install[@]}"
+  printf "${note}Package not installed:\n%s\n" "${to_install[@]}"
   yay -S "$pacman_confirm" --needed "${to_install[@]}"
 }
 
@@ -544,7 +549,7 @@ ffmpeg is binary precompiled from arch repository not arch user repository"
   #install latex
   if ask_prompt "install latex?$yellow_b$red(you may not need it,in short its a tool to write books)?$reset y/n:  "; then
     sudo pacman -S texlive-most
-    sudo pacman -S "lyx texmaker"
+    yay -S "lyx texmaker"
   fi
 
   if ask_prompt "install steam? (y/n):	"; then

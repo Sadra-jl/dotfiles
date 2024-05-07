@@ -4,7 +4,7 @@ local plugins = {
     "stevearc/dressing.nvim",
 }
 
-table.insert(lvim.plugins, plugins)
+vim.list_extend(lvim.plugins, plugins)
 
 -- configuring
 require("swenv").setup({

@@ -32,7 +32,10 @@ lvim.builtin.treesitter.ensure_installed = {
 
 --setup formatter
 local formatters =require("lvim.lsp.null-ls.formatters")
-formatters.setup({ {name="black"}, })
+formatters.setup({
+    { command = "black", filetypes = { "python" } },
+    { command = "isort", filetypes = { "python" } },
+})
 
 local linters = require("lvim.lsp.null-ls.linters")
 linters.setup({

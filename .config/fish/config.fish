@@ -61,3 +61,5 @@ complete -f -c dotnet -a "(dotnet complete (commandline -cp))"
 starship init fish | source
 
 alias cd "z"
+
+complete -fc nuke --arguments '(nuke :complete (commandline -cp))'

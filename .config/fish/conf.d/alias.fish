@@ -4,6 +4,7 @@ alias la='eza -a --color=always --group-directories-first'
 
 #list only directories
 alias ld='eza -lD'
+alias ldn="eza -lD | awk '{print \$NF}'"
 
 #list only files
 alias lf='eza -lF --color=always | grep -v/'

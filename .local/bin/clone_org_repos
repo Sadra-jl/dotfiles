@@ -1,0 +1,11 @@
+#! /bin/bash
+
+ORG_NAME="$1"
+DEPTH=1
+
+# gh repo list "$ORG_NAME" --limit 1000 --json nameWithOwner,url --jq '.[]|[.nameWithOwner,.url]|@tsv' | while read -r repo url _; do
+
+gh repo list "$ORG_NAME" --limit 1000 | while read -r repo _; do
+  # git clone "$url" "$repo"
+  echo "$repo"
+done

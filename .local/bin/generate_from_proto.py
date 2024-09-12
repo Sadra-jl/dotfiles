@@ -17,17 +17,11 @@
 #
 
 """
-Python Script to Generate C#(and few others) Classes from Protobuf Files
-
-This script requires the 'colorama' library for colored terminal output.
-To install the dependency, run:
-
-    pip install colorama
-
-Alternatively, you can install all dependencies from the requirements.txt file:
-
-    pip install -r requirements.txt
+Python Script to Generate C# Classes from Protobuf Files
+9/12/24
 """
+
+#todo: use versions functional
 
 import os
 import stat
@@ -111,14 +105,14 @@ def download_protoc(version: str = "28.0") -> str:
 
     return protoc_path
 
-def check_tool_installed(tool_name: str, tool_path: Optional[str] = None) -> str:
-    """Check if protoc is installed, or download it if not found.
+def check_tool_installed(tool_name: str, tool_path: Optional[str] = None, validate_installation: bool = True) -> str:
+    """Check if required tool is installed, or download it if not found.
 
     Args:
-        protoc_path: Optional path to the protoc compiler.
+        tool_path: Optional path to the tool.
 
     Returns:
-        The path to the protoc compiler.
+        The path to the tool.
     """
     if tool_path:
         if not os.path.exists(tool_path):
@@ -128,17 +122,18 @@ def check_tool_installed(tool_name: str, tool_path: Optional[str] = None) -> str
 
     tool_path = which(tool_name)
     if tool_path:
-        print_info(f"Found protoc in PATH: {tool_path}")
+        print_info(f"Found {tool_name} in PATH: {tool_path}")
         return tool_path
 
     print_warn(f"{tool_name} not found, downloading...")
     tool_path = download_protoc()
 
-    try:
-        subprocess.run([tool_path, "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print_info(f"{tool_name} installed successfully.")
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"{tool_name} installation failed: {e}")
+    if validate_installation:
+        try:
+            subprocess.run([tool_path, "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print_info(f"{tool_name} installed successfully.")
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(f"{tool_name} installation failed: {e}")
 
     return tool_path
 
@@ -147,7 +142,7 @@ def check_protoc_installed(protoc_path: Optional[str] = None) -> str:
 
 
 def check_grpc_plugin_installed(grpc_plugin_path: Optional[str] = None) -> str:
-    return check_tool_installed("grpc_csharp_plugin", grpc_plugin_path)
+    return check_tool_installed("grpc_csharp_plugin", grpc_plugin_path, False)
 
 
 def download_grpc_csharp_plugin(version: str = "2.66.0"):
@@ -197,13 +192,13 @@ def download_grpc_csharp_plugin(version: str = "2.66.0"):
 
 
 def generate_classes(protoc_path: str, proto_dir: str, output_dir: str, grpc_plugin_path: str) -> None:
-    """Generate classes from .proto files for the specified languages using the protoc compiler.
+    """Generate classes from .proto files using the protoc compiler and grpc_csharp_plugin.
 
     Args:
         protoc_path: Path to the protoc compiler.
         proto_dir: Directory containing .proto files.
         output_dir: Directory for the generated classes.
-        languages: List of target languages for generated classes.
+        grpc_plugin_path: Path to the grpc c# plugin compiler.
     """
     proto_files = [str(p) for p in Path(proto_dir).rglob("*.proto")]
     if not proto_files:

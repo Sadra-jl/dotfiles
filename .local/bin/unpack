@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+case "$1" in
+    *.tgz|*.tbz|*.tar|*.tar.*)
+        tar -xf "$1"
+        ;;
+    *.zip)
+        unzip "$1"
+        ;;
+    *.rar)
+        unrar x "$1"
+        ;;
+    *.gz)
+        gzip -d "$1"
+        ;;
+    *.bz2)
+        bzip2 -dk "$1"
+        ;;
+    *)
+        echo "Unsupported file type: $1"
+        ;;
+esac

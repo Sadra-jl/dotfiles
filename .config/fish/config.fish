@@ -19,7 +19,7 @@
 # First line removes the path; second line sets it.  Without the first line,
 # your path gets massive and fish becomes very slow.
 set -e fish_user_paths
-set -U fish_user_paths $HOME/.bin  $HOME/.local/bin $HOME/.config/emacs/bin $HOME/Applications /var/lib/flatpak/exports/bin/ $fish_user_paths
+set -U fish_user_paths $HOME/.bin  $HOME/.local/bin $HOME/.config/emacs/bin $HOME/Applications /var/lib/flatpak/exports/bin/ $fish_user_paths $HOME/.cargo/bin
 
 ### EXPORT
 set fish_greeting                                 # Supresses fish's intro message
@@ -63,3 +63,4 @@ starship init fish | source
 alias cd "z"
 
 complete -fc nuke --arguments '(nuke :complete (commandline -cp))'
+

@@ -1,3 +1,7 @@
+lvim.format_on_save = false
+lvim.transparent_window = false
+
+
 -- load all source files in lua directory
 local info = debug.getinfo(1, 'S')
 local module_directory = string.match(info.source, '^@?(.*)/') or "."

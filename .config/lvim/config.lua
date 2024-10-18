@@ -1,4 +1,3 @@
-lvim.format_on_save = false
 lvim.transparent_window = false
 
 
@@ -10,7 +9,8 @@ local module_filename = string.match(info.source, '/([^/]*)$')
 function Scandir(directory)
     local i, t, popen = 0, {}, io.popen
     local pfile = popen('find "' ..
-    directory .. '/lua" -type f -name "*.lua" | sed "s/.*lua\\///; s/\\//./g; s/.lua//; s/' .. module_filename .. '//"')
+        directory ..
+        '/lua" -type f -name "*.lua" | sed "s/.*lua\\///; s/\\//./g; s/.lua//; s/' .. module_filename .. '//"')
 
     if pfile == nil then return {} end
 

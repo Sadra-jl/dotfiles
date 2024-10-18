@@ -6,11 +6,10 @@ local function map(mode, key, value, description)
         vim.keymap.set(mode, key, value, { silent = true })
         return
     end
-        vim.keymap.set(mode, key, value, { desc = description })
+    vim.keymap.set(mode, key, value, { desc = description })
 end
-
 --changed open buffer(tabs) with tab and shift-tab
-map('n', '<Tab>', vim.cmd.bnext,   'Go to next buffer')
+map('n', '<Tab>', vim.cmd.bnext, 'Go to next buffer')
 map('n', '<S-Tab>', vim.cmd.bprev, 'Go to previous buffer')
 
 -- Mimic shell movements
@@ -29,8 +28,10 @@ local opts = {
 }
 
 for name, value in pairs(opts) do
-  vim.opt[name] = value
+    vim.opt[name] = value
 end
+
+lvim.format_on_save = true
 
 local fish_paths = _set({
     "/usr/bin/fish",
@@ -45,4 +46,3 @@ local fish_paths = _set({
 --    vim.opt.shell = os.getenv('SHELL')
 -- end
 --
-

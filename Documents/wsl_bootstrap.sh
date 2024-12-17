@@ -119,7 +119,7 @@ cat <<EOF | tee /etc/wsl.conf
 systemd=true
 
 [user]
-default = $new_username
+default=$new_username
 EOF
 
 echo "User $new_username with shell $user_shell has been created and added to the sudoers file."
